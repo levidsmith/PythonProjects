@@ -1,3 +1,4 @@
+#2020 Levi D. Smith - levidsmith.com
 from random import randrange
 
 print('Number Guessing Game - 2020 Levi D. Smith')
