@@ -1,4 +1,5 @@
 #2020 Levi D. Smith - levidsmith.com
+#Ship square now stops when the key is released.  Bounds checking added
 import pygame
 
 class Ship:

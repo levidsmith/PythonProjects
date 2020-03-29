@@ -1,4 +1,5 @@
 #2020 Levi D. Smith - levidsmith.com
+#Get a simple ship represented by a cyan square moving around on keypress events
 import pygame
 
 class Ship:

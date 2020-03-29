@@ -1,4 +1,5 @@
 #2020 Levi D. Smith - levidsmith.com
+#Shooting bullets (red rectangles) added;  Bullet collision with enemy detected and sets enemy isAlive to False
 import pygame
 
 class Ship:

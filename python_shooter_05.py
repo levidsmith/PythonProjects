@@ -1,4 +1,5 @@
 #2020 Levi D. Smith - levidsmith.com
+#Multiple enemies added;  Shoot cooldown added so that only one bullet can be fired every 0.5 seconds
 import pygame
 
 class Ship:

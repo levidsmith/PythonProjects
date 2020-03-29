@@ -1,4 +1,5 @@
 #2020 Levi D. Smith - levidsmith.com
+#Displays various drawing primitives (line, rectangle, circle)
 import pygame
 
 pygame.init()

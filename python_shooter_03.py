@@ -1,4 +1,5 @@
 #2020 Levi D. Smith - levidsmith.com
+#Enemy added, which moves back and forth horizontally
 import pygame
 
 class Ship:
