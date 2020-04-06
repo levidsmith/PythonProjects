@@ -19,6 +19,8 @@ class Card:
     y = 0
     w = 64
     h = 128
+#    w = 32
+#    h = 64
     targetPosition = (0, 0)
 	
     def __init__(self, init_id, init_x, init_y):
