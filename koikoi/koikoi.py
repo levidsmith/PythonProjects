@@ -6,9 +6,10 @@ import os.path
 from card import Card
 from player import Player
 from gamemanager import GameManager
+from globals import Globals
 
 
-SCREEN_SIZE = (1280, 720)
+#SCREEN_SIZE = (1280, 720)
 #players = []
 #cards = []
 #table = []
@@ -34,9 +35,11 @@ SCREEN_SIZE = (1280, 720)
 def main():
 
     pygame.init()
-    display = pygame.display.set_mode(SCREEN_SIZE)
+    display = pygame.display.set_mode(Globals.SCREEN_SIZE)
     pygame.display.set_caption('Hanafuda Koi Koi')
-    font = pygame.font.Font("Aerovias Brasil NF.ttf", 32)
+    font = []
+    font.append(pygame.font.Font("Aerovias Brasil NF.ttf", 20))
+    font.append(pygame.font.Font("Aerovias Brasil NF.ttf", 32))
 
     gamemanager = GameManager()
     

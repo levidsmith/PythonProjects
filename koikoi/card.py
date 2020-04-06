@@ -3,6 +3,9 @@ import pygame
 
 print("Card Class")
 class Card:
+
+    MOVE_SPEED = 10
+
     id = -1
     iMonth = 0
     iPoints = 0
@@ -13,7 +16,12 @@ class Card:
     isPoetryRibbon = False
     isSakeCup = False
     isSpecial = False
+    isBoarDeerButterfly = False
     img = None
+    img_back = None
+    img_border = None
+    
+    isHidden = True
     
     x = 0
     y = 0
@@ -31,61 +39,60 @@ class Card:
     def draw(self, display, font):
         c = (128, 128, 128)
         pygame.draw.rect(display, c, (self.x, self.y, self.w, self.h))
-        if (self.img != None):
+        
+        if (self.isHidden):
+            display.blit(self.img_back, (self.x, self.y, self.w, self.h))
+        
+        elif (self.img != None):
             display.blit(self.img, (self.x, self.y, self.w, self.h))
-
-
-        c_black = (0, 0, 0)
-
-#        c = (255, 255, 255)
-#        text = font.render(str(self.id), True, (255, 255, 255), c_black)
-#        display.blit(text, (self.x, self.y + 100))
-
+            display.blit(self.img_border, (self.x, self.y, self.w, self.h))
+        
+            c_black = (0, 0, 0)
         
 #Display month
-        c = (255, 255, 255)
-        text = font.render(str(self.iMonth), True, c, c_black)
-        display.blit(text, (self.x, self.y))
+            c = (255, 255, 255)
+            text = font[0].render(str(self.iMonth), True, c, c_black)
+            display.blit(text, (self.x, self.y))
         
-        iLineSpacing = 32
+            iLineSpacing = 32
 
 #Display attribute
-        if (self.isLight):
-            c = (255, 255, 0)
-            text = font.render("L", True, c, c_black)
-            display.blit(text, (self.x, self.y + iLineSpacing))
+            if (self.isLight):
+                c = (255, 255, 0)
+                text = font[0].render("L", True, c, c_black)
+                display.blit(text, (self.x, self.y + iLineSpacing))
 
         
-        if (self.isRedRibbon):
-            c = (255, 0, 0)
-            if (self.isPoetryRibbon):
-                text = font.render("RPR", True, c, c_black)
-            else:
-                text = font.render("RR", True, c, c_black)
-            display.blit(text, (self.x, self.y + iLineSpacing))
+            if (self.isRedRibbon):
+                c = (255, 0, 0)
+                if (self.isPoetryRibbon):
+                    text = font[0].render("RPR", True, c, c_black)
+                else:
+                    text = font[0].render("RR", True, c, c_black)
+                display.blit(text, (self.x, self.y + iLineSpacing))
         
-        if (self.isBlueRibbon):
-            c = (128, 128, 255)
-            text = font.render("BR", True, c, c_black)
-            display.blit(text, (self.x, self.y + iLineSpacing))
+            if (self.isBlueRibbon):
+                c = (128, 128, 255)
+                text = font[0].render("BR", True, c, c_black)
+                display.blit(text, (self.x, self.y + iLineSpacing))
 
-        if (self.isSpecial):
-            c = (255, 128, 0)
-            text = font.render("S", True, c, c_black)
-            display.blit(text, (self.x, self.y + iLineSpacing))
+            if (self.isSpecial):
+                c = (255, 128, 0)
+                text = font[0].render("S", True, c, c_black)
+                display.blit(text, (self.x, self.y + iLineSpacing))
 
-        if (self.isSakeCup):
-            c = (255, 128, 0)
-            text = font.render("SC", True, c, c_black)
-            display.blit(text, (self.x, self.y + iLineSpacing))
+            if (self.isSakeCup):
+                c = (255, 128, 0)
+                text = font[0].render("SC", True, c, c_black)
+                display.blit(text, (self.x, self.y + iLineSpacing))
 
-        if (self.isRainMan):
-            c = (255, 128, 0)
-            text = font.render("RM", True, c, c_black)
-            display.blit(text, (self.x, self.y + iLineSpacing))
+            if (self.isRainMan):
+                c = (255, 128, 0)
+                text = font[0].render("RM", True, c, c_black)
+                display.blit(text, (self.x, self.y + iLineSpacing))
 
     def update(self):
-        iSpeed = 5
+        iSpeed = self.MOVE_SPEED
     
         if (self.x < self.targetPosition[0]):
             self.x += iSpeed
@@ -107,3 +114,11 @@ class Card:
                 self.y = self.targetPosition[1]
             
             
+
+    def getIsNormal(self):
+        isNormal = True
+        if (self.isLight or self.isRainMan or self.isRedRibbon or self.isBlueRibbon \
+            or self.isSakeCup or self.isSpecial):
+            isNormal = False
+        
+        return isNormal
