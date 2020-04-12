@@ -57,6 +57,12 @@ def main():
                     keepLooping = False
                 if (event.key == pygame.K_d):
                     gamemanager.restart()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                gamemanager.mousePressed(pygame.mouse.get_pos())
+            elif event.type == pygame.MOUSEBUTTONUP:
+                gamemanager.mouseReleased(pygame.mouse.get_pos())
+            elif event.type == pygame.MOUSEMOTION:
+                gamemanager.mouseMoved(pygame.mouse.get_pos())
     
 #        update()
 #        draw(display, font)

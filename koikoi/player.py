@@ -9,6 +9,12 @@ from drawhelper import DrawHelper
 class Player:
 #    name = None
 #    position = (0, 0)
+
+    STEP_HAND_MATCH = 0
+    STEP_DRAW = 1
+    STEP_DRAW_MATCH = 2
+    STEP_DONE = 3
+    STEP_NAMES = ("Hand Match", "Draw", "Draw Match", "Done")
     
     def __init__(self, init_gamemanager):
         name = "hello"
@@ -20,6 +26,10 @@ class Player:
         self.isHidden = True
 #        self.score_text = "None, 0 points"
         self.checkScore()
+        self.isHuman = False
+        self.iStep = Player.STEP_HAND_MATCH
+        
+        self.selectedCard = None
     
     def update(self):
 #        print("update player " + self.name + " card count: " + str(len(self.cards)) )
@@ -57,6 +67,8 @@ class Player:
 #        text = font.render(self.name, True, c, c_bkg)
 #        display.blit(text, self.position)
         DrawHelper.drawTextShadow(self.name, self.position[0], self.position[1] + 128, (255, 255, 255), display, font[1])
+#        if (self.isPlayerTurn):
+        DrawHelper.drawTextShadow(str(self.iStep) + ": " + Player.STEP_NAMES[self.iStep], self.position[0], self.position[1] + 128 + 32, (0, 255, 255), display, font[1])
         DrawHelper.drawTextShadow(self.score_text, self.position[0] + 1080, self.position[1] - 20, (255, 255, 255), display, font[0])
 
 
@@ -64,15 +76,31 @@ class Player:
             
             
     def playTurn(self):
-        print(self.name + " playTurn")
-        self.checkMatch()
-        self.drawCard()
-        self.setCardPositions()
+#        print(self.name + " playTurn " + " STEP " + str(self.iStep))
+        
+        if (not self.isHuman):
+            
+            if (self.iStep == Player.STEP_HAND_MATCH):
+                self.checkHandMatch()
+                self.iWaitDelay = 2 * 60
+ #               self.setCardPositions()
+            
+            elif (self.iStep == Player.STEP_DRAW):
+                self.drawCard()
+                self.iWaitDelay = 2 * 60
+#                self.setCardPositions()
+            elif (self.iStep == Player.STEP_DRAW_MATCH):
+                self.checkDrawMatch()
+                self.iWaitDelay = 2 * 60
 
-        self.isPlayerTurn = False
+        
+        if (self.iStep == Player.STEP_DONE):
+            self.setCardPositions()
+            self.gamemanager.setCardPositions()
+            self.isPlayerTurn = False
         
         
-    def checkMatch(self):
+    def checkHandMatch(self):
         print("checking match")
         match_card1 = None
         match_card2 = None
@@ -84,39 +112,93 @@ class Player:
                     match_card2 = card_table
                     
         if ( (match_card1 != None) and (match_card2 != None)):
-            print("Match - Month " + str(match_card1.iMonth) + " - IDs " + str(match_card1.id) + ", " + str(match_card2.id))
+            successfulMatch = self.doMatch(match_card1, match_card2)
+            if (successfulMatch):
+                self.cards.remove(match_card1)
+
+        else:
+            self.iStep = Player.STEP_DRAW
+            
+
+    def checkDrawMatch(self):
+        print("checking match")
+        match_card = None
+        draw_card = self.gamemanager.draw_card
+
+        for card_table in self.gamemanager.table:
+            if (draw_card.iMonth == card_table.iMonth):
+                match_card = card_table
+                    
+        if (match_card != None):
+            self.doMatch(draw_card, match_card)
+        else:
+            self.doDiscard(draw_card)
+            
+
+
+#        self.setCardPositions()
+        self.iStep = Player.STEP_DONE
+                    
+
+    def doMatch(self, match_card1, match_card2):
+        successfulMatch = False
+    
+        print("Match - Month " + str(match_card1.iMonth) + " - IDs " + str(match_card1.id) + ", " + str(match_card2.id))
+        if (match_card1.iMonth == match_card2.iMonth):
             self.match_cards.append(match_card1)
             match_card1.isHidden = False
-            self.cards.remove(match_card1)
+#            self.cards.remove(match_card1)
 
             self.match_cards.append(match_card2)
             self.gamemanager.table.remove(match_card2)
             self.checkScore()
-                    
-
+            self.setCardPositions()
+#            self.iStep = Player.STEP_DRAW
+            successfulMatch = True
+        
+        return successfulMatch
+        
+    
     def drawCard(self):
         if (len(self.gamemanager.cards) > 0):
             draw_card = self.gamemanager.cards.pop()
-#            draw_card.isHidden = self.isHidden
+            draw_card.isHidden = False
+            draw_card.targetPosition = self.gamemanager.draw_card_position
+
+            self.gamemanager.draw_card = draw_card
+            self.iStep = Player.STEP_DRAW_MATCH
+        else:
+            print("No more cards")
         
-            match_card = None
-            for card_table in self.gamemanager.table:
-                if (draw_card.iMonth == card_table.iMonth):
-                    match_card = card_table
+        
+            
+#            match_card = None
+#            for card_table in self.gamemanager.table:
+#                if (draw_card.iMonth == card_table.iMonth):
+#                    match_card = card_table
                 
-            if (match_card != None):
-                print("Match - Month " + str(match_card.iMonth) + " - IDs " + str(draw_card.id) + ", " + str(match_card.id))
-                self.match_cards.append(match_card)
-                match_card.isHidden = False
-                self.gamemanager.table.remove(match_card)
+#            if (match_card != None):
+#                print("Match - Month " + str(match_card.iMonth) + " - IDs " + str(draw_card.id) + ", " + str(match_card.id))
+#                self.match_cards.append(match_card)
+#                match_card.isHidden = False
+#                self.gamemanager.table.remove(match_card)
                 
-                draw_card.isHidden = False
-                self.match_cards.append(draw_card)
-                self.checkScore()
-            else:
-                draw_card.isHidden = False
-                self.gamemanager.table.append(draw_card)
+#                draw_card.isHidden = False
+#                self.match_cards.append(draw_card)
+#                self.checkScore()
+#            else:
+#                draw_card.isHidden = False
+#                self.gamemanager.table.append(draw_card)
                 
+#            self.setCardPositions()
+        
+#        self.iStep = Player.STEP_DONE
+      
+    def doDiscard(self, card):
+        self.gamemanager.table.append(card)
+
+
+        
         
         
         
@@ -214,3 +296,6 @@ class Player:
             card.targetPosition = (self.position[0] + 700 + ((i % 10) * 32), self.position[1] + (math.floor(i / 10) * 64))
             i += 1
     
+    
+    def handleInput(self):
+        print("Handle Input")

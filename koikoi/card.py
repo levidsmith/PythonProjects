@@ -23,6 +23,8 @@ class Card:
     
     isHidden = True
     
+#    isDragged = False
+    
     x = 0
     y = 0
     w = 64
@@ -30,6 +32,7 @@ class Card:
 #    w = 32
 #    h = 64
     targetPosition = (0, 0)
+    previousPosition = (0, 0)
 	
     def __init__(self, init_id, init_x, init_y):
         self.id = init_id
@@ -51,7 +54,7 @@ class Card:
         
 #Display month
             c = (255, 255, 255)
-            text = font[0].render(str(self.iMonth), True, c, c_black)
+            text = font[0].render(str(self.iMonth + 1), True, c, c_black)
             display.blit(text, (self.x, self.y))
         
             iLineSpacing = 32
@@ -122,3 +125,6 @@ class Card:
             isNormal = False
         
         return isNormal
+        
+    def __str__(self):
+        return "Card ID: " + str(self.id) + " Month: " + str(self.iMonth)
