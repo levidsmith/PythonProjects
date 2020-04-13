@@ -20,6 +20,7 @@ class GameManager:
     
     card_images = []
     card_back_images = []
+    sound_effects = {}
     
     background = []
 
@@ -32,6 +33,7 @@ class GameManager:
     
     def __init__(self):
         self.load_images()
+        self.load_audio()
         self.restart()
 
     def load_images(self):
@@ -56,6 +58,13 @@ class GameManager:
 
         imgBackground = pygame.image.load('images/background.jpg')
         self.background.append(imgBackground)
+
+    def load_audio(self):
+        pygame.mixer.music.load('audio/PyKoiKoi_game.mp3')
+        pygame.mixer.music.set_volume(0.5)
+        self.sound_effects['card_drop'] = pygame.mixer.Sound('audio/card_drop.wav')
+        self.sound_effects['next_player'] = pygame.mixer.Sound('audio/next_player.wav')
+        
     
     def restart(self):
         self.iCurrentPlayer = 0
@@ -218,6 +227,8 @@ class GameManager:
         
         self.players[self.iCurrentPlayer].isPlayerTurn = True
         self.players[self.iCurrentPlayer].iWaitDelay = self.WAIT_DELAY
+        
+        pygame.mixer.music.play(-1)
 
 
 
@@ -272,6 +283,8 @@ class GameManager:
         
 
         print("doNextPlayer " + str(self.iCurrentPlayer))
+        self.sound_effects['next_player'].play()
+        
             
 
     def setCardPositions(self):

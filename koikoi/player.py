@@ -115,6 +115,7 @@ class Player:
             successfulMatch = self.doMatch(match_card1, match_card2)
             if (successfulMatch):
                 self.cards.remove(match_card1)
+                self.iStep = Player.STEP_DRAW
 
         else:
             self.iStep = Player.STEP_DRAW
@@ -155,6 +156,7 @@ class Player:
             self.setCardPositions()
 #            self.iStep = Player.STEP_DRAW
             successfulMatch = True
+            self.gamemanager.sound_effects['card_drop'].play()
         
         return successfulMatch
         
