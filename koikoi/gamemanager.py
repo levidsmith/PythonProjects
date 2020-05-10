@@ -6,8 +6,11 @@ import os.path
 
 from card import Card
 from player import Player
+from button import Button
 from drawhelper import DrawHelper
 from globals import Globals
+
+from operator import itemgetter, attrgetter
 
 class GameManager:
 
@@ -30,12 +33,34 @@ class GameManager:
     draw_card_position = (256, 296)
     table_position = (400, 200)
     
+    buttons = []
+    
     
     def __init__(self):
         self.load_images()
         self.load_audio()
         self.restart()
+    
+        self.makeButtons()
+        
 
+    
+    def makeButtons(self):
+        b = Button("Arrange", 0, 0)
+        b.action = self.arrangeCards
+        self.buttons.append(b)
+
+        b = Button("Koi", 200, 0)
+        b.action = self.doKoi
+        self.buttons.append(b)
+        
+        b = Button("Stop", 400, 0)
+        b.action = self.doStop
+        self.buttons.append(b)
+
+
+
+    
     def load_images(self):
         for i in range(12):
             for j in range(4):
@@ -64,7 +89,9 @@ class GameManager:
         pygame.mixer.music.set_volume(0.5)
         self.sound_effects['card_drop'] = pygame.mixer.Sound('audio/card_drop.wav')
         self.sound_effects['next_player'] = pygame.mixer.Sound('audio/next_player.wav')
-        
+
+    def set_audio_volume(self, vol):
+        pygame.mixer.music.set_volume(0)
     
     def restart(self):
         self.iCurrentPlayer = 0
@@ -265,6 +292,9 @@ class GameManager:
         
         for player in self.players:
             player.draw(display, font)
+            
+        for button in self.buttons:
+            button.draw(display, font)
 
         strCopyright = '2020 Levi D. Smith'
 #        c = (255, 255, 255)
@@ -303,6 +333,7 @@ class GameManager:
         mouseY = mousePosition[1]
 #        print("Mouse pressed " + str(mouseX) + ", " + str(mouseY))
         self.selectCard(mouseX, mouseY)
+        self.checkButtons(mouseX, mouseY)
     
     def mouseReleased(self, mousePosition):
         mouseX = mousePosition[0]
@@ -332,8 +363,8 @@ class GameManager:
                     currentPlayer.selectedCard = card
                     currentPlayer.selectedCard.previousPosition = (currentPlayer.selectedCard.x, currentPlayer.selectedCard.y)
 
-            if (len(self.cards) > 0 and self.isCardAtPosition(self.cards[len(self.cards) - 1], x, y)):
-                currentPlayer.drawCard()
+#            if (len(self.cards) > 0 and self.isCardAtPosition(self.cards[len(self.cards) - 1], x, y)):
+#                currentPlayer.drawCard()
 
 
         elif (currentPlayer.iStep == Player.STEP_DRAW):
@@ -374,8 +405,11 @@ class GameManager:
                         currentPlayer.selectedCard.targetPosition = currentPlayer.selectedCard.previousPosition
                         currentPlayer.selectedCard = None
                 else:
-                    currentPlayer.selectedCard.targetPosition = currentPlayer.selectedCard.previousPosition
+                    currentPlayer.doDiscard(currentPlayer.selectedCard)
                     currentPlayer.selectedCard = None
+                    self.setCardPositions()
+                    currentPlayer.iStep = Player.STEP_DRAW
+
 
             elif (currentPlayer.iStep == Player.STEP_DRAW_MATCH):
                 if (landedCard != None):
@@ -422,3 +456,28 @@ class GameManager:
             
         return isCardAtPosition
         
+        
+    def arrangeCards(self):
+        print("arrangeCards")
+        self.table.sort(key=attrgetter('iMonth'))
+        self.setCardPositions()
+        
+        for player in self.players:
+            player.cards.sort(key=attrgetter('iMonth'))
+            player.setCardPositions()
+        
+        
+        
+    def doKoi(self):
+        print("Koi")
+        
+    def doStop(self):
+        print("Stop")
+        
+    def checkButtons(self, x, y):
+        for button in self.buttons:
+            if (button.isClicked(x, y)):
+                print(button.strLabel + " button clicked")
+                button.action()
+                
+    

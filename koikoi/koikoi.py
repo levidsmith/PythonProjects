@@ -57,6 +57,9 @@ def main():
                     keepLooping = False
                 if (event.key == pygame.K_d):
                     gamemanager.restart()
+                if (event.key == pygame.K_m):
+                    gamemanager.set_audio_volume(0)
+                    
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 gamemanager.mousePressed(pygame.mouse.get_pos())
             elif event.type == pygame.MOUSEBUTTONUP:

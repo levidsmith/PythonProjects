@@ -114,10 +114,13 @@ class Player:
         if ( (match_card1 != None) and (match_card2 != None)):
             successfulMatch = self.doMatch(match_card1, match_card2)
             if (successfulMatch):
-                self.cards.remove(match_card1)
+#                self.cards.remove(match_card1)
                 self.iStep = Player.STEP_DRAW
 
         else:
+            if (len(self.cards) > 0):
+                self.doDiscard(self.cards[0]) #Just discard the first card in the hand for now
+            
             self.iStep = Player.STEP_DRAW
             
 
@@ -148,6 +151,8 @@ class Player:
         if (match_card1.iMonth == match_card2.iMonth):
             self.match_cards.append(match_card1)
             match_card1.isHidden = False
+            if (match_card1 in self.cards):
+                self.cards.remove(match_card1)
 #            self.cards.remove(match_card1)
 
             self.match_cards.append(match_card2)
@@ -197,7 +202,11 @@ class Player:
 #        self.iStep = Player.STEP_DONE
       
     def doDiscard(self, card):
+        card.isHidden = False
         self.gamemanager.table.append(card)
+        self.gamemanager.setCardPositions()
+        if (card in self.cards):
+            self.cards.remove(card)
 
 
         
