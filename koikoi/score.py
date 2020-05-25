@@ -118,6 +118,8 @@ class Score:
         if (not strKey in self.scoreDict):
             if (iNormals >= 10):
                 iPoints = 1 + (iNormals - 10)
+#            if (iNormals >= 1):
+#                iPoints = 99
                 self.scoreDict[strKey] = iPoints
                 self.hasNewScore = True
 

@@ -15,7 +15,9 @@ class Player:
     STEP_DRAW = 1
     STEP_DRAW_MATCH = 2
     STEP_DONE = 3
-    STEP_NAMES = ("Hand Match or Discard", "Draw", "Draw Match or Discard", "Done")
+    STEP_HAND_MATCH_CONTINUE = 4
+    STEP_DRAW_MATCH_CONTINUE = 5
+    STEP_NAMES = ("Hand Match or Discard", "Draw", "Draw Match or Discard", "Done", "Continue to Draw", "Continue to Done")
     
     MATCH_CARDS_PER_ROW = 8
     
@@ -39,7 +41,7 @@ class Player:
         self.isHuman = False
         self.iStep = Player.STEP_HAND_MATCH
         self.selectedCard = None
-        self.waitContinueDecision = False
+#        self.waitContinueDecision = False
     
     def update(self):
         for card in self.cards:
@@ -51,9 +53,8 @@ class Player:
         if (self.iWaitDelay > 0):
             self.iWaitDelay -= 1
             
-        if (not self.waitContinueDecision):
-            if (self.isPlayerTurn and self.iWaitDelay <= 0):
-                self.playTurn()
+        if (self.isPlayerTurn and self.iWaitDelay <= 0):
+            self.playTurn()
     
     def draw(self, display, font):
         for card in self.cards:
@@ -95,19 +96,27 @@ class Player:
     def playTurn(self):
 #        print(self.name + " playTurn " + " STEP " + str(self.iStep))
         
+        #Computer controlled opponent
         if (not self.isHuman):
             
             if (self.iStep == Player.STEP_HAND_MATCH):
-                self.checkHandMatch()
+                self.checkHandMatchCPU()
                 self.iWaitDelay = 2 * 60
  #               self.setCardPositions()
+            
+            elif (self.iStep == Player.STEP_HAND_MATCH_CONTINUE):
+                self.checkContinueCPU()
+                self.iWaitDelay = 2 * 60
             
             elif (self.iStep == Player.STEP_DRAW):
                 self.drawCard()
                 self.iWaitDelay = 2 * 60
 #                self.setCardPositions()
             elif (self.iStep == Player.STEP_DRAW_MATCH):
-                self.checkDrawMatch()
+                self.checkDrawMatchCPU()
+                self.iWaitDelay = 2 * 60
+            elif (self.iStep == Player.STEP_DRAW_MATCH_CONTINUE):
+                self.checkContinueCPU()
                 self.iWaitDelay = 2 * 60
 
         
@@ -117,7 +126,7 @@ class Player:
             self.isPlayerTurn = False
         
         
-    def checkHandMatch(self):
+    def checkHandMatchCPU(self):
         print("checking match")
         match_card1 = None
         match_card2 = None
@@ -132,7 +141,11 @@ class Player:
             successfulMatch = self.doMatch(match_card1, match_card2)
             if (successfulMatch):
 #                self.cards.remove(match_card1)
-                self.iStep = Player.STEP_DRAW
+                if (self.score.hasNewScore):
+                    self.iStep = Player.STEP_HAND_MATCH_CONTINUE
+                    self.continuePrompt()
+                else:
+                    self.iStep = Player.STEP_DRAW
 
         else:
             if (len(self.cards) > 0):
@@ -141,7 +154,7 @@ class Player:
             self.iStep = Player.STEP_DRAW
             
 
-    def checkDrawMatch(self):
+    def checkDrawMatchCPU(self):
         print("checking match")
         match_card = None
         draw_card = self.gamemanager.draw_card
@@ -151,40 +164,67 @@ class Player:
                 match_card = card_table
                     
         if (match_card != None):
-            self.doMatch(draw_card, match_card)
+            successfulMatch = self.doMatch(draw_card, match_card)
         else:
             self.doDiscard(draw_card)
             
 
 
-#        self.setCardPositions()
-        self.iStep = Player.STEP_DONE
+        if (self.score.hasNewScore):
+            self.iStep = Player.STEP_DRAW_MATCH_CONTINUE
+            self.continuePrompt()
+        else:
+            self.iStep = Player.STEP_DONE
                     
+
+    def checkContinueCPU(self):
+        #We should have fancy AI here to figure out if they should continue
+        self.gamemanager.doContinue()
+    
 
     def doMatch(self, match_card1, match_card2):
         successfulMatch = False
     
         print("Match - Month " + str(match_card1.iMonth) + " - IDs " + str(match_card1.id) + ", " + str(match_card2.id))
-        if (match_card1.iMonth == match_card2.iMonth):
+        
+        possible_matches = self.getPossibleMatches(match_card1)
+        
+#        if (match_card1.iMonth == match_card2.iMonth):
+        if (match_card2 in possible_matches):
             self.match_cards.append(match_card1)
             match_card1.isHidden = False
             if (match_card1 in self.cards):
                 self.cards.remove(match_card1)
-#            self.cards.remove(match_card1)
 
-            self.match_cards.append(match_card2)
-            self.gamemanager.table.remove(match_card2)
+
+            if (len(possible_matches) == 3):  #handle the special case of three matching cards
+                for card in possible_matches:
+                    self.match_cards.append(card)
+                    self.gamemanager.table.remove(card)
+
+            else:
+                self.match_cards.append(match_card2)
+                self.gamemanager.table.remove(match_card2)
+
+
             self.score.checkScore(self.match_cards)
             self.setCardPositions()
-#            self.iStep = Player.STEP_DRAW
             successfulMatch = True
             self.gamemanager.sound_effects['card_drop'].play()
             
-            if (self.score.hasNewScore):
-                self.continuePrompt()
+                
         
         return successfulMatch
         
+    
+    def getPossibleMatches(self, match_card):
+        possible_matches = []
+        for card in self.gamemanager.table:
+            if (match_card.iMonth == card.iMonth):
+                possible_matches.append(card)
+        return possible_matches
+                
+                
     
     def drawCard(self):
         if (len(self.gamemanager.cards) > 0):
@@ -256,13 +296,26 @@ class Player:
         
     def continuePrompt(self):
         self.gamemanager.continuePrompt()
-        self.waitContinueDecision = True
+#        self.waitContinueDecision = True
+        
+
         
     def doContinue(self):
-        self.waitContinueDecision = False
+#        self.waitContinueDecision = False
+        if (self.iStep == Player.STEP_HAND_MATCH_CONTINUE):
+            self.score.hasNewScore = False
+            self.iStep = Player.STEP_DRAW
+        elif (self.iStep == Player.STEP_DRAW_MATCH_CONTINUE):
+            self.score.hasNewScore = False
+            self.iStep = Player.STEP_DONE
         
     def doStop(self):
-        self.waitContinueDecision = False
+        print("Ending the round")
+#       self.waitContinueDecision = False
+#        if (self.iStep == Player.STEP_HAND_MATCH_CONTINUE):
+#            self.iStep = Player.STEP_DRAW
+#        elif (self.iStep == Player.STEP_DRAW_MATCH_CONTINUE):
+#            self.iStep = Player.STEP_DONE
     
     
     def nextRound(self):
@@ -272,4 +325,93 @@ class Player:
         self.score.checkScore(self.match_cards)
         self.iStep = Player.STEP_HAND_MATCH
         self.selectedCard = None
-        self.waitContinueDecision = False
+#        self.waitContinueDecision = False
+
+
+
+
+#let the game manager pass the mouse events to the player        
+    def mousePressed(self, x, y):
+
+        if (self.iStep == Player.STEP_HAND_MATCH):
+            for card in self.cards:
+                if (self.gamemanager.isCardAtPosition(card, x, y)):
+                    print("Selected card " + str(card))
+                    self.selectedCard = card
+                    self.selectedCard.previousPosition = (self.selectedCard.x, self.selectedCard.y)
+
+
+
+        elif (self.iStep == Player.STEP_DRAW):
+            if (len(self.gamemanager.cards) > 0 and self.gamemanager.isCardAtPosition(self.gamemanager.cards[len(self.gamemanager.cards) - 1], x, y)):
+                self.drawCard()
+
+        elif (self.iStep == Player.STEP_DRAW_MATCH):
+            if (self.gamemanager.draw_card != None):
+                card = self.gamemanager.draw_card
+                if (self.gamemanager.isCardAtPosition(card, x, y)):
+                    print("Selected card " + str(card))
+                    self.selectedCard = card
+                    self.selectedCard.previousPosition = (self.selectedCard.x, self.selectedCard.y)
+                    
+
+    def mouseReleased(self, x, y):
+        if (self.selectedCard != None):
+
+            landedCard = None
+            for card in self.gamemanager.table:
+                if (self.gamemanager.isCardAtPosition(card, x, y)):
+                    landedCard = card
+                
+                
+                
+            if (self.iStep == Player.STEP_HAND_MATCH):
+                if (landedCard != None):
+                    successfulMatch = self.doMatch(self.selectedCard, landedCard)
+                    if (successfulMatch):
+                    
+                        if (self.score.hasNewScore):
+                            self.iStep = Player.STEP_HAND_MATCH_CONTINUE
+                            self.continuePrompt()
+                        else:
+                            self.iStep = Player.STEP_DRAW
+                        self.selectedCard = None
+                    else:
+                        self.selectedCard.targetPosition = self.selectedCard.previousPosition
+                        self.selectedCard = None
+                else:
+                    self.doDiscard(self.selectedCard)
+                    self.selectedCard = None
+                    self.gamemanager.setCardPositions()
+                    self.iStep = Player.STEP_DRAW
+
+
+            elif (self.iStep == Player.STEP_DRAW_MATCH):
+                if (landedCard != None):
+                    successfulMatch = self.doMatch(self.selectedCard, landedCard)
+                    if (successfulMatch):
+                        self.selectedCard = None
+                        if (self.score.hasNewScore):
+                            self.iStep = Player.STEP_DRAW_MATCH_CONTINUE
+                            self.continuePrompt()
+                        else:
+                            self.iStep = Player.STEP_DONE
+                         
+                    else:
+                        self.selectedCard.targetPosition = self.selectedCard.previousPosition
+                        self.selectedCard = None
+                
+                else:
+                    self.doDiscard(self.selectedCard)
+                    
+#                    self.selectedCard.targetPosition = self.selectedCard.previousPosition
+                    self.selectedCard = None
+                    self.iStep = Player.STEP_DONE
+                
+        
+    def dragCard(self, x, y):
+        if (not self.selectedCard == None):
+            self.selectedCard.x = x
+            self.selectedCard.y = y
+            self.selectedCard.targetPosition = (x, y)
+

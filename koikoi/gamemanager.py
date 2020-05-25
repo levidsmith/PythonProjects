@@ -17,7 +17,7 @@ class GameManager:
     WAIT_DELAY = 60 * 2
 
     players = []
-    cards = []
+#    cards = []
     table = []
     draw_card = None
     
@@ -36,12 +36,14 @@ class GameManager:
     buttons = []
     
     def __init__(self):
+        self.cards = []
         self.load_images()
         self.load_audio()
         self.restart()
     
         self.makeButtons()
         self.isCursorHovered = False
+        
         
 
     
@@ -101,6 +103,8 @@ class GameManager:
         self.players.clear()
         self.cards.clear()
         self.table.clear()
+        self.draw_card = None
+        self.iRound = 0
     
         for i in range(12):
             for j in range(4):
@@ -276,30 +280,41 @@ class GameManager:
     
     
     def nextRound(self):
+        self.iRound += 1
         for player in self.players:
-            for card in player.cards:
+            while (len(player.cards) > 0):
+                card = player.cards.pop()
                 self.cards.append(card)
-                player.cards.remove(card)
 
-            for card in player.match_cards:
+            while (len(player.match_cards) > 0):
+                card = player.match_cards.pop()
                 self.cards.append(card)
-                player.match_cards.remove(card)
+
+        
+#            for c in player.cards:
+#                self.cards.append(c)
+#                player.cards.remove(c)
+
+#            for c in player.match_cards:
+#                self.cards.append(c)
+#                player.match_cards.remove(c)
                 
+            player.setCardPositions()
             player.nextRound()
 
-        for card in self.table:
+
+        while (len(self.table) > 0):
+            card = self.table.pop()
             self.cards.append(card)
-            self.table.remove(card)
+
+#        for card in self.table:
+#            self.cards.append(card)
+#            self.table.remove(card)
+            
+        for card in self.cards:
+            card.isHidden = True
 
         random.shuffle(self.cards)
-        
-#        i = 0
-#        for card in self.cards:
-#            card.x = self.deck_position[0] + (i * 2)
-#            card.y = self.deck_position[1]
-#            card.targetPosition = (card.x, card.y)
-#            i += 1
-
         
         self.setCardPositions()
         self.dealCards()
@@ -339,6 +354,13 @@ class GameManager:
             
         for button in self.buttons:
             button.draw(display, font)
+
+
+        strRound = "Round " + str(self.iRound + 1)
+        DrawHelper.drawTextShadow(strRound, 1280/2, 4, (255, 255, 255), display, font[1])
+
+        DrawHelper.drawTextShadow("Stack: " + str(len(self.cards)), 1280/2, 32, (255, 255, 255), display, font[1])
+
 
         strCopyright = '2020 Levi D. Smith'
 #        c = (255, 255, 255)
@@ -382,13 +404,19 @@ class GameManager:
     def mousePressed(self, mousePosition):
         mouseX = mousePosition[0]
         mouseY = mousePosition[1]
-        self.selectCard(mouseX, mouseY)
+#        self.selectCard(mouseX, mouseY)
+        currentPlayer = self.players[self.iCurrentPlayer]
+        currentPlayer.mousePressed(mouseX, mouseY)
+
         self.checkButtonsPress(mouseX, mouseY)
     
     def mouseReleased(self, mousePosition):
         mouseX = mousePosition[0]
         mouseY = mousePosition[1]
-        self.dropCard(mouseX, mouseY)
+#        self.dropCard(mouseX, mouseY)
+        currentPlayer = self.players[self.iCurrentPlayer]
+        currentPlayer.mouseReleased(mouseX, mouseY)
+
         
     def mouseMoved(self, mousePosition):
         mouseX = mousePosition[0]
@@ -397,7 +425,9 @@ class GameManager:
         isHovered = self.isCursorHovered
         self.isCursorHovered = False #Set cursor hovered to false, and then set it to true if any cards or buttons are hovered
 
-        self.dragCard(mouseX, mouseY)
+        currentPlayer = self.players[self.iCurrentPlayer]
+        currentPlayer.dragCard(mouseX, mouseY)
+        
         self.checkButtonsHover(mouseX, mouseY)
         self.checkCardsHover(mouseX, mouseY)
         
@@ -412,106 +442,6 @@ class GameManager:
             
     
         
-        
-    def selectCard(self, x, y):
-    
-#        for player in self.players:
-        currentPlayer = self.players[self.iCurrentPlayer]
-
-
-
-        if (currentPlayer.iStep == Player.STEP_HAND_MATCH):
-            for card in currentPlayer.cards:
-                if (self.isCardAtPosition(card, x, y)):
-                    print("Selected card " + str(card))
-                    currentPlayer.selectedCard = card
-                    currentPlayer.selectedCard.previousPosition = (currentPlayer.selectedCard.x, currentPlayer.selectedCard.y)
-
-#            if (len(self.cards) > 0 and self.isCardAtPosition(self.cards[len(self.cards) - 1], x, y)):
-#                currentPlayer.drawCard()
-
-
-        elif (currentPlayer.iStep == Player.STEP_DRAW):
-            if (len(self.cards) > 0 and self.isCardAtPosition(self.cards[len(self.cards) - 1], x, y)):
-                currentPlayer.drawCard()
-
-        elif (currentPlayer.iStep == Player.STEP_DRAW_MATCH):
-            if (self.draw_card != None):
-                card = self.draw_card
-                if (self.isCardAtPosition(card, x, y)):
-                    print("Selected card " + str(card))
-                    currentPlayer.selectedCard = card
-                    currentPlayer.selectedCard.previousPosition = (currentPlayer.selectedCard.x, currentPlayer.selectedCard.y)
-        
-
-        
-        
-
-                    
-    def dropCard(self, x, y):
-        currentPlayer = self.players[self.iCurrentPlayer]
-        if (currentPlayer.selectedCard != None):
-
-            landedCard = None
-            for card in self.table:
-                if (self.isCardAtPosition(card, x, y)):
-                    landedCard = card
-                
-                
-                
-            if (currentPlayer.iStep == Player.STEP_HAND_MATCH):
-                if (landedCard != None):
-                    successfulMatch = currentPlayer.doMatch(currentPlayer.selectedCard, landedCard)
-                    if (successfulMatch):
-                        currentPlayer.iStep = Player.STEP_DRAW
-                        currentPlayer.selectedCard = None
-                    else:
-                        currentPlayer.selectedCard.targetPosition = currentPlayer.selectedCard.previousPosition
-                        currentPlayer.selectedCard = None
-                else:
-                    currentPlayer.doDiscard(currentPlayer.selectedCard)
-                    currentPlayer.selectedCard = None
-                    self.setCardPositions()
-                    currentPlayer.iStep = Player.STEP_DRAW
-
-
-            elif (currentPlayer.iStep == Player.STEP_DRAW_MATCH):
-                if (landedCard != None):
-                    successfulMatch = currentPlayer.doMatch(currentPlayer.selectedCard, landedCard)
-                    if (successfulMatch):
-                        currentPlayer.selectedCard = None
-                        currentPlayer.iStep = Player.STEP_DONE
-                    else:
-                        currentPlayer.selectedCard.targetPosition = currentPlayer.selectedCard.previousPosition
-                        currentPlayer.selectedCard = None
-                
-                else:
-                    currentPlayer.doDiscard(currentPlayer.selectedCard)
-                    
-#                    currentPlayer.selectedCard.targetPosition = currentPlayer.selectedCard.previousPosition
-                    currentPlayer.selectedCard = None
-                    currentPlayer.iStep = Player.STEP_DONE
-                    
-          
-                    
-
-
-
-
-                    
-                    
-
-                
-            
-                
-                
-        
-    def dragCard(self, x, y):
-        currentPlayer = self.players[self.iCurrentPlayer]
-        if (not currentPlayer.selectedCard == None):
-            currentPlayer.selectedCard.x = x
-            currentPlayer.selectedCard.y = y
-            currentPlayer.selectedCard.targetPosition = (x, y)
             
     def isCardAtPosition(self, card, x, y):
         isCardAtPosition = False
@@ -548,8 +478,11 @@ class GameManager:
         self.buttons[1].hide()
         self.buttons[2].hide()
 
-        for player in self.players: 
-            player.iRoundScores.append(player.score.iTotalPoints)
+        for player in self.players:
+            if (player == self.players[self.iCurrentPlayer]):
+                player.iRoundScores.append(player.score.iTotalPoints)
+            else:
+                player.iRoundScores.append(0)
 
 
         
