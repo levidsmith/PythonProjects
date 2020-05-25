@@ -3,6 +3,7 @@ import pygame
 import math
 
 from card import Card
+from score import Score
 from drawhelper import DrawHelper
 
 
@@ -14,41 +15,45 @@ class Player:
     STEP_DRAW = 1
     STEP_DRAW_MATCH = 2
     STEP_DONE = 3
-    STEP_NAMES = ("Hand Match", "Draw", "Draw Match", "Done")
+    STEP_NAMES = ("Hand Match or Discard", "Draw", "Draw Match or Discard", "Done")
+    
+    MATCH_CARDS_PER_ROW = 8
+    
     
     def __init__(self, init_gamemanager):
         name = "hello"
         self.cards = []
         self.match_cards = []
+        self.score = Score()
+        self.iRoundScores = []
         self.isPlayerTurn = False
         self.iWaitDelay = 0
         self.gamemanager = init_gamemanager
         self.isHidden = True
 #        self.score_text = "None, 0 points"
-        self.checkScore()
+
+#        self.score_offset = (960, -20)
+#        self.card_types_offset = (1080, -20)
+
+        self.score.checkScore(self.match_cards)
         self.isHuman = False
         self.iStep = Player.STEP_HAND_MATCH
-        
         self.selectedCard = None
+        self.waitContinueDecision = False
     
     def update(self):
-#        print("update player " + self.name + " card count: " + str(len(self.cards)) )
-        
         for card in self.cards:
-#            print("update player card " + str(card.id))
             card.update()
 
         for card in self.match_cards:
-#            print("update player card " + str(card.id))
             card.update()
-
-
               
         if (self.iWaitDelay > 0):
             self.iWaitDelay -= 1
             
-        if (self.isPlayerTurn and self.iWaitDelay <= 0):
-            self.playTurn()
+        if (not self.waitContinueDecision):
+            if (self.isPlayerTurn and self.iWaitDelay <= 0):
+                self.playTurn()
     
     def draw(self, display, font):
         for card in self.cards:
@@ -69,9 +74,21 @@ class Player:
         DrawHelper.drawTextShadow(self.name, self.position[0], self.position[1] + 128, (255, 255, 255), display, font[1])
 #        if (self.isPlayerTurn):
         DrawHelper.drawTextShadow(str(self.iStep) + ": " + Player.STEP_NAMES[self.iStep], self.position[0], self.position[1] + 128 + 32, (0, 255, 255), display, font[1])
-        DrawHelper.drawTextShadow(self.score_text, self.position[0] + 1080, self.position[1] - 20, (255, 255, 255), display, font[0])
+        DrawHelper.drawTextShadow(self.score.card_type_totals_text, self.position[0] + self.card_types_offset[0], self.position[1] + self.card_types_offset[1], (255, 255, 255), display, font[0])
+
+        DrawHelper.drawTextShadow(self.score.score_text, self.position[0] + self.score_offset[0], self.position[1] + self.score_offset[1], (255, 255, 255), display, font[0])
 
 
+        
+        iMatchScore = 0
+        strRoundsScore = ""
+        for iScore in self.iRoundScores:
+            iMatchScore += iScore
+            strRoundsScore += str(iScore) + ","
+            
+        strRoundsScore += " Total = " + str(iMatchScore)
+
+        DrawHelper.drawTextShadow(strRoundsScore, self.position[0] + 140, self.position[1] + 140, (255, 255, 255), display, font[0])
             
             
             
@@ -157,11 +174,14 @@ class Player:
 
             self.match_cards.append(match_card2)
             self.gamemanager.table.remove(match_card2)
-            self.checkScore()
+            self.score.checkScore(self.match_cards)
             self.setCardPositions()
 #            self.iStep = Player.STEP_DRAW
             successfulMatch = True
             self.gamemanager.sound_effects['card_drop'].play()
+            
+            if (self.score.hasNewScore):
+                self.continuePrompt()
         
         return successfulMatch
         
@@ -213,84 +233,6 @@ class Player:
         
         
         
-    def checkScore(self):
-        iLights = 0
-        iRainMan = 0
-        iPoetryRibbons = 0
-        iRedRibbons = 0
-        iBlueRibbons = 0
-        iRibbons = 0
-        iSpecials = 0
-        iSakeCup = 0
-        iBoarDeerButterfly = 0
-        iNormals = 0
-        
-        for card in self.match_cards:
-            if (card.isLight):
-                iLights += 1
-
-            if (card.isRainMan):
-                iRainMan += 1
-            
-            if (card.isRedRibbon):
-                iRedRibbons += 1
-
-            if (card.isBlueRibbon):
-                iBlueRibbons += 1
-
-            if (card.isPoetryRibbon):
-                iPoetryRibbons += 1
-
-            if (card.isSakeCup):
-                iSakeCup += 1
-                iSpecials += 1
-
-            if (card.isSpecial):
-                iSpecials += 1
-            
-            if (card.isBoarDeerButterfly):
-                iBoarDeerButterfly += 1
-
-            if (card.getIsNormal()):
-                iNormals += 1
-                
-                
-            iRibbons = iRedRibbons + iBlueRibbons
-            
-            
-        self.score_text = ""
-        if (iLights > 0):
-            self.score_text += "Lights " + str(iLights) + "\n"
-
-        if (iRainMan > 0):
-            self.score_text += "Rain Man " + str(iRainMan) + "\n"
-
-        if (iSakeCup > 0):
-            self.score_text += "Sake Cup " + str(iSakeCup) + "\n"
-
-        if (iRibbons > 0): 
-            self.score_text += "Ribbons " + str(iRibbons) + "\n"
-
-        if (iRedRibbons > 0): 
-            self.score_text += "Red Ribbons " + str(iRedRibbons) + "\n"
-
-        if (iBlueRibbons > 0): 
-            self.score_text += "Blue Ribbons " + str(iBlueRibbons) + "\n"
-
-        if (iPoetryRibbons > 0): 
-            self.score_text += "Poetry Ribbons " + str(iPoetryRibbons) + "\n"
-
-        if (iSpecials > 0): 
-            self.score_text += "Specials " + str(iSpecials) + "\n"
-
-        if (iBoarDeerButterfly > 0): 
-            self.score_text += "B,D,BF " + str(iBoarDeerButterfly) + "\n"
-
-
-        if (iNormals > 0): 
-            self.score_text += "Normals " + str(iNormals) + "\n"
-#            + "\nRed Ribbons " + str(iRedRibbons)
- #           + "\nNormals " + str(iNormals)
 
 
         
@@ -304,9 +246,30 @@ class Player:
 
         i = 0
         for card in self.match_cards:
-            card.targetPosition = (self.position[0] + 700 + ((i % 10) * 32), self.position[1] + (math.floor(i / 10) * 64))
+            card.targetPosition = (self.position[0] + self.match_card_position[0] + ((i % Player.MATCH_CARDS_PER_ROW) * 32), self.position[1] + self.match_card_position[1] + (math.floor(i / Player.MATCH_CARDS_PER_ROW) * 64))
             i += 1
     
     
     def handleInput(self):
         print("Handle Input")
+        
+        
+    def continuePrompt(self):
+        self.gamemanager.continuePrompt()
+        self.waitContinueDecision = True
+        
+    def doContinue(self):
+        self.waitContinueDecision = False
+        
+    def doStop(self):
+        self.waitContinueDecision = False
+    
+    
+    def nextRound(self):
+        self.score = Score()
+        self.isPlayerTurn = False
+        self.iWaitDelay = 0
+        self.score.checkScore(self.match_cards)
+        self.iStep = Player.STEP_HAND_MATCH
+        self.selectedCard = None
+        self.waitContinueDecision = False

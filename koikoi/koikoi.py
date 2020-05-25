@@ -3,6 +3,7 @@ import pygame
 import random
 import math
 import os.path
+import sys
 from card import Card
 from player import Player
 from gamemanager import GameManager
@@ -42,6 +43,9 @@ def main():
     font.append(pygame.font.Font("Aerovias Brasil NF.ttf", 32))
 
     gamemanager = GameManager()
+    if ("-nomusic" in sys.argv):
+        print("Disable Music")
+        gamemanager.set_audio_volume(0)
     
 #    init()
 

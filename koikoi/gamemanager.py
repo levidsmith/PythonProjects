@@ -35,27 +35,30 @@ class GameManager:
     
     buttons = []
     
-    
     def __init__(self):
         self.load_images()
         self.load_audio()
         self.restart()
     
         self.makeButtons()
+        self.isCursorHovered = False
         
 
     
     def makeButtons(self):
         b = Button("Arrange", 0, 0)
         b.action = self.arrangeCards
+        b.show()
         self.buttons.append(b)
 
         b = Button("Koi", 200, 0)
-        b.action = self.doKoi
+        b.action = self.doContinue
+        b.hide()
         self.buttons.append(b)
         
         b = Button("Stop", 400, 0)
         b.action = self.doStop
+        b.hide()
         self.buttons.append(b)
 
 
@@ -135,6 +138,7 @@ class GameManager:
                         card.isPoetryRibbon = True
                     if (j == 3):
                         card.isLight = True
+                        card.isSakuraCurtain = True
 
                 if (i == 3):
                     if (j == 2):
@@ -167,12 +171,14 @@ class GameManager:
                         card.isSpecial = True
                     if (j == 3):
                         card.isLight = True
+                        card.isMoon = True
 
                 if (i == 8):
                     if (j == 2):
                         card.isBlueRibbon = True
                     if (j == 3):
                         card.isSakeCup = True
+                        card.isNormal = True
 
                 if (i == 9):
                     if (j == 2):
@@ -199,24 +205,8 @@ class GameManager:
         
         random.shuffle(self.cards)
         
-        i = 0
-        for card in self.cards:
-            card.x = self.deck_position[0] + (i * 2)
-            card.y = self.deck_position[1]
-            card.targetPosition = (card.x, card.y)
-            i += 1
 
 
-        #Deal to the table
-        for i in range(8):
-            draw_card = self.cards.pop()
-            draw_card.x = 0
-            draw_card.y = (Globals.SCREEN_SIZE[1] - Card.h) / 2
-            draw_card.isHidden = False
-#            draw_card.targetPosition = (480 + ((i % 4) * 80), 200 + 160 * math.floor(i / 4))
-            self.table.append(draw_card)
-
-        self.setCardPositions()
         
 
         #Create players
@@ -224,12 +214,15 @@ class GameManager:
         p1.name = "Player One"
         p1.isHidden = True
         p1.position = (64, 32)
-        for i in range(8):
-            draw_card = self.cards.pop()
-            draw_card.x = 0
-            draw_card.y = p1.position[1]
-            draw_card.targetPosition = (p1.position[0] + (i * 80), p1.position[1])
-            p1.cards.append(draw_card)
+        p1.score_offset = (960, -20)
+        p1.card_types_offset = (1080, -20)
+        p1.match_card_position = (660, 0)
+#        for i in range(8):
+#            draw_card = self.cards.pop()
+#            draw_card.x = 0
+#            draw_card.y = p1.position[1]
+#            draw_card.targetPosition = (p1.position[0] + (i * 80), p1.position[1])
+#            p1.cards.append(draw_card)
 
         self.players.append(p1)
     
@@ -241,22 +234,75 @@ class GameManager:
         p2.isHidden = False
         p2.isHuman = True
         p2.position = (64, 512)
-        for i in range(8):
-            draw_card = self.cards.pop()
-            draw_card.x = 0
-            draw_card.y = p2.position[1]
-            draw_card.isHidden = False
-            
-            draw_card.targetPosition = (p2.position[0] + (i * 80), p2.position[1])
-            p2.cards.append(draw_card)
+        p2.score_offset = (960, -140)
+        p2.card_types_offset = (1080, -140)
+        p2.match_card_position = (660, 0)
+        
 
         self.players.append(p2)
+        
+        self.dealCards()
         
         self.players[self.iCurrentPlayer].isPlayerTurn = True
         self.players[self.iCurrentPlayer].iWaitDelay = self.WAIT_DELAY
         
         pygame.mixer.music.play(-1)
 
+    def dealCards(self):
+        #Deal to the table
+        for i in range(8):
+            draw_card = self.cards.pop()
+            draw_card.x = 0
+            draw_card.y = (Globals.SCREEN_SIZE[1] - Card.h) / 2
+            draw_card.isHidden = False
+            self.table.append(draw_card)
+
+        self.setCardPositions()
+
+        for player in self.players:
+
+            for i in range(8):
+                draw_card = self.cards.pop()
+                draw_card.x = 0
+                draw_card.y = player.position[1]
+                if (player.isHuman):
+                    draw_card.isHidden = False
+                else:
+                    draw_card.isHidden = True
+            
+                draw_card.targetPosition = (player.position[0] + (i * 80), player.position[1])
+                player.cards.append(draw_card)
+
+    
+    
+    def nextRound(self):
+        for player in self.players:
+            for card in player.cards:
+                self.cards.append(card)
+                player.cards.remove(card)
+
+            for card in player.match_cards:
+                self.cards.append(card)
+                player.match_cards.remove(card)
+                
+            player.nextRound()
+
+        for card in self.table:
+            self.cards.append(card)
+            self.table.remove(card)
+
+        random.shuffle(self.cards)
+        
+#        i = 0
+#        for card in self.cards:
+#            card.x = self.deck_position[0] + (i * 2)
+#            card.y = self.deck_position[1]
+#            card.targetPosition = (card.x, card.y)
+#            i += 1
+
+        
+        self.setCardPositions()
+        self.dealCards()
 
 
     def update(self):
@@ -270,8 +316,6 @@ class GameManager:
         for player in self.players:
             player.update()
 
-#        print ("Current Player: " + str(self.iCurrentPlayer))
-#        self.setCardPositions()
 
         if (not self.players[self.iCurrentPlayer].isPlayerTurn):
             self.doNextPlayer()
@@ -325,27 +369,47 @@ class GameManager:
         for card in self.table:
             card.targetPosition = (self.table_position[0] + ((i % iCardsPerRow) * 80), self.table_position[1] + 160 * math.floor(i / iCardsPerRow))
             i += 1
+            
+        for card in self.cards:
+            card.x = self.deck_position[0] + (i * 2)
+            card.y = self.deck_position[1]
+            card.targetPosition = (card.x, card.y)
+            i += 1
+
 
 
 
     def mousePressed(self, mousePosition):
         mouseX = mousePosition[0]
         mouseY = mousePosition[1]
-#        print("Mouse pressed " + str(mouseX) + ", " + str(mouseY))
         self.selectCard(mouseX, mouseY)
-        self.checkButtons(mouseX, mouseY)
+        self.checkButtonsPress(mouseX, mouseY)
     
     def mouseReleased(self, mousePosition):
         mouseX = mousePosition[0]
         mouseY = mousePosition[1]
-#        print("Mouse released " + str(mouseX) + ", " + str(mouseY))
         self.dropCard(mouseX, mouseY)
         
     def mouseMoved(self, mousePosition):
         mouseX = mousePosition[0]
         mouseY = mousePosition[1]
-#        print("Mouse moved " + str(mouseX) + ", " + str(mouseY))
+
+        isHovered = self.isCursorHovered
+        self.isCursorHovered = False #Set cursor hovered to false, and then set it to true if any cards or buttons are hovered
+
         self.dragCard(mouseX, mouseY)
+        self.checkButtonsHover(mouseX, mouseY)
+        self.checkCardsHover(mouseX, mouseY)
+        
+        #compare the previous cursor state with the current cursor state
+        #only change the cursor if the state changes, to reduce flicker
+        if (isHovered != self.isCursorHovered):
+            if (self.isCursorHovered):
+                pygame.mouse.set_cursor(*pygame.cursors.diamond)
+            else:
+                pygame.mouse.set_cursor(*pygame.cursors.arrow)
+            
+            
     
         
         
@@ -468,16 +532,60 @@ class GameManager:
         
         
         
-    def doKoi(self):
-        print("Koi")
+    def doContinue(self):
+        print("Koi (Continue)")
+        self.buttons[1].hide()
+        self.buttons[2].hide()
+
+        currentPlayer = self.players[self.iCurrentPlayer]
+        currentPlayer.doContinue()
+
+
+        
         
     def doStop(self):
-        print("Stop")
+        print("Stop - End Round")
+        self.buttons[1].hide()
+        self.buttons[2].hide()
+
+        for player in self.players: 
+            player.iRoundScores.append(player.score.iTotalPoints)
+
+
         
-    def checkButtons(self, x, y):
+        self.nextRound()
+        
+    def checkButtonsPress(self, x, y):
         for button in self.buttons:
             if (button.isClicked(x, y)):
                 print(button.strLabel + " button clicked")
                 button.action()
                 
+    def checkButtonsHover(self, x, y):
+        for button in self.buttons:
+            self.isCursorHovered = self.isCursorHovered or button.isHovered(x, y)
+
+    def checkCardsHover(self, x, y):
+        for card in self.table:
+            self.isCursorHovered = self.isCursorHovered or card.isHovered(x, y)
+
+        for card in self.cards:
+            self.isCursorHovered = self.isCursorHovered or card.isHovered(x, y)
+
+        if (self.draw_card != None):
+            self.isCursorHovered = self.isCursorHovered or self.draw_card.isHovered(x, y)
+
+        
+        for player in self.players:
+            for card in player.cards:
+                self.isCursorHovered = self.isCursorHovered or card.isHovered(x, y)
+        
+            for card in player.match_cards:
+                self.isCursorHovered = self.isCursorHovered or card.isHovered(x, y)
     
+    
+    def continuePrompt(self):
+        #show the "Koi" and "Stop" buttons
+        self.buttons[1].show()
+        self.buttons[2].show()
+        

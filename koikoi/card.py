@@ -11,6 +11,8 @@ class Card:
     iPoints = 0
     isLight = False
     isRainMan = False
+    isSakuraCurtain = False
+    isMoon = False
     isRedRibbon = False
     isBlueRibbon = False
     isPoetryRibbon = False
@@ -128,3 +130,14 @@ class Card:
         
     def __str__(self):
         return "Card ID: " + str(self.id) + " Month: " + str(self.iMonth)
+        
+        
+    def isHovered(self, x, y):
+        if (x > self.x and x < self.x + self.w and y > self.y and y < self.y + self.h):
+#            pygame.mouse.set_cursor(*pygame.cursors.diamond)
+            return True
+        else:
+            return False
+
+    
+        
