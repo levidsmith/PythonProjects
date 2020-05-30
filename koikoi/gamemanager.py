@@ -4,6 +4,7 @@ import random
 import math
 import os.path
 
+from screen import Screen
 from card import Card
 from player import Player
 from button import Button
@@ -12,7 +13,7 @@ from globals import Globals
 
 from operator import itemgetter, attrgetter
 
-class GameManager:
+class GameManager(Screen):
 
     WAIT_DELAY = 60 * 2
 
@@ -35,12 +36,14 @@ class GameManager:
     
     buttons = []
     
-    def __init__(self):
+    def __init__(self, init_application):
+        self.iTotalRounds = 6
+        self.application = init_application
         self.cards = []
         self.load_images()
         self.load_audio()
         self.restart()
-    
+
         self.makeButtons()
         self.isCursorHovered = False
         
@@ -63,6 +66,11 @@ class GameManager:
         b.hide()
         self.buttons.append(b)
 
+        b = Button("Quit", 1100, 688)
+#        b.action = self.application.doQuit()
+        b.action = self.doReturnToTitle
+        b.show()
+        self.buttons.append(b)
 
 
     
@@ -108,20 +116,12 @@ class GameManager:
     
         for i in range(12):
             for j in range(4):
-#                print(str(i) + ", " + str(j))
                 card = Card((i * 4) + j,  i * 80, j * 150)
                 card.iMonth = i
                 card.img = self.card_images[(i * 4) + j]
                 card.img_back = self.card_back_images[0]
                 card.img_border = self.card_back_images[1]
 
-#                strFile = 'images/hanafuda_' + str(i + 1) + '-' + str(j + 1) + '.jpg'
-#                if (os.path.isfile(strFile)):
-#                    card.img = pygame.image.load(strFile)
- #                   card.img = pygame.transform.scale(card.img, (card.w, card.h))
-                
-            
-            
                 if (i == 0):
                     if (j == 2):
                         card.isRedRibbon = True
@@ -281,6 +281,12 @@ class GameManager:
     
     def nextRound(self):
         self.iRound += 1
+
+        if (iRound >= self.iTotalRounds):
+            self.application.loadScreen("gameover")
+
+            
+
         for player in self.players:
             while (len(player.cards) > 0):
                 card = player.cards.pop()
@@ -522,3 +528,5 @@ class GameManager:
         self.buttons[1].show()
         self.buttons[2].show()
         
+    def doReturnToTitle(self):
+        self.application.loadScreen("title")
