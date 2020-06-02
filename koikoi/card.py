@@ -56,7 +56,7 @@ class Card:
         
 #Display month
             c = (255, 255, 255)
-            text = font[0].render(str(self.iMonth + 1), True, c, c_black)
+            text = font['normal'].render(str(self.iMonth + 1), True, c, c_black)
             display.blit(text, (self.x, self.y))
         
             iLineSpacing = 32
@@ -64,36 +64,36 @@ class Card:
 #Display attribute
             if (self.isLight):
                 c = (255, 255, 0)
-                text = font[0].render("L", True, c, c_black)
+                text = font['normal'].render("L", True, c, c_black)
                 display.blit(text, (self.x, self.y + iLineSpacing))
 
         
             if (self.isRedRibbon):
                 c = (255, 0, 0)
                 if (self.isPoetryRibbon):
-                    text = font[0].render("RPR", True, c, c_black)
+                    text = font['normal'].render("RPR", True, c, c_black)
                 else:
-                    text = font[0].render("RR", True, c, c_black)
+                    text = font['normal'].render("RR", True, c, c_black)
                 display.blit(text, (self.x, self.y + iLineSpacing))
         
             if (self.isBlueRibbon):
                 c = (128, 128, 255)
-                text = font[0].render("BR", True, c, c_black)
+                text = font['normal'].render("BR", True, c, c_black)
                 display.blit(text, (self.x, self.y + iLineSpacing))
 
             if (self.isSpecial):
                 c = (255, 128, 0)
-                text = font[0].render("S", True, c, c_black)
+                text = font['normal'].render("S", True, c, c_black)
                 display.blit(text, (self.x, self.y + iLineSpacing))
 
             if (self.isSakeCup):
                 c = (255, 128, 0)
-                text = font[0].render("SC", True, c, c_black)
+                text = font['normal'].render("SC", True, c, c_black)
                 display.blit(text, (self.x, self.y + iLineSpacing))
 
             if (self.isRainMan):
                 c = (255, 128, 0)
-                text = font[0].render("RM", True, c, c_black)
+                text = font['normal'].render("RM", True, c, c_black)
                 display.blit(text, (self.x, self.y + iLineSpacing))
 
     def update(self):

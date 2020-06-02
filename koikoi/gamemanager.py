@@ -7,6 +7,7 @@ import os.path
 from screen import Screen
 from card import Card
 from player import Player
+from table import Table
 from button import Button
 from drawhelper import DrawHelper
 from globals import Globals
@@ -19,7 +20,7 @@ class GameManager(Screen):
 
     players = []
 #    cards = []
-    table = []
+#    table = []
     draw_card = None
     
     card_images = []
@@ -32,7 +33,7 @@ class GameManager(Screen):
     
     deck_position = (64, 296)
     draw_card_position = (256, 296)
-    table_position = (400, 200)
+#    table_position = (400, 200)
     
     buttons = []
     
@@ -40,6 +41,7 @@ class GameManager(Screen):
         self.iTotalRounds = 6
         self.application = init_application
         self.cards = []
+        self.table = Table()
         self.load_images()
         self.load_audio()
         self.restart()
@@ -94,7 +96,7 @@ class GameManager(Screen):
         self.card_back_images.append(img)
 
 
-        imgBackground = pygame.image.load('images/background.jpg')
+        imgBackground = pygame.image.load('images/background_game.jpg')
         self.background.append(imgBackground)
 
     def load_audio(self):
@@ -110,7 +112,7 @@ class GameManager(Screen):
         self.iCurrentPlayer = 0
         self.players.clear()
         self.cards.clear()
-        self.table.clear()
+        self.table.cards.clear()
         self.draw_card = None
         self.iRound = 0
     
@@ -215,11 +217,11 @@ class GameManager(Screen):
 
         #Create players
         p1 = Player(self)
-        p1.name = "Player One"
+        p1.name = "CPU"
         p1.isHidden = True
         p1.position = (64, 32)
-        p1.score_offset = (960, -20)
-        p1.card_types_offset = (1080, -20)
+        p1.score_offset = (900, -20)
+        p1.card_types_offset = (1040, -20)
         p1.match_card_position = (660, 0)
 #        for i in range(8):
 #            draw_card = self.cards.pop()
@@ -234,12 +236,12 @@ class GameManager(Screen):
 
 
         p2 = Player(self)
-        p2.name = "Player Two"
+        p2.name = "Player"
         p2.isHidden = False
         p2.isHuman = True
         p2.position = (64, 512)
-        p2.score_offset = (960, -140)
-        p2.card_types_offset = (1080, -140)
+        p2.score_offset = (900, -140)
+        p2.card_types_offset = (1040, -140)
         p2.match_card_position = (660, 0)
         
 
@@ -259,7 +261,7 @@ class GameManager(Screen):
             draw_card.x = 0
             draw_card.y = (Globals.SCREEN_SIZE[1] - Card.h) / 2
             draw_card.isHidden = False
-            self.table.append(draw_card)
+            self.table.cards.append(draw_card)
 
         self.setCardPositions()
 
@@ -282,7 +284,7 @@ class GameManager(Screen):
     def nextRound(self):
         self.iRound += 1
 
-        if (iRound >= self.iTotalRounds):
+        if (self.iRound >= self.iTotalRounds):
             self.application.loadScreen("gameover")
 
             
@@ -309,8 +311,8 @@ class GameManager(Screen):
             player.nextRound()
 
 
-        while (len(self.table) > 0):
-            card = self.table.pop()
+        while (len(self.table.cards) > 0):
+            card = self.table.cards.pop()
             self.cards.append(card)
 
 #        for card in self.table:
@@ -328,7 +330,7 @@ class GameManager(Screen):
 
     def update(self):
 #        print ("GameManager update")
-        for card in self.table:
+        for card in self.table.cards:
             card.update()
             
         if (self.draw_card != None):
@@ -346,10 +348,12 @@ class GameManager(Screen):
     def draw(self, display, font):
         display.blit(self.background[0], (0, 0))
 
+        self.table.draw(display, font)
+
         for card in self.cards:
             card.draw(display, font)
 
-        for card in self.table:
+        for card in self.table.cards:
             card.draw(display, font)
         
         if (self.draw_card != None):
@@ -363,16 +367,16 @@ class GameManager(Screen):
 
 
         strRound = "Round " + str(self.iRound + 1)
-        DrawHelper.drawTextShadow(strRound, 1280/2, 4, (255, 255, 255), display, font[1])
+        DrawHelper.drawTextShadow(strRound, 1280/2, 4, (255, 255, 255), display, font['normal'])
 
-        DrawHelper.drawTextShadow("Stack: " + str(len(self.cards)), 1280/2, 32, (255, 255, 255), display, font[1])
+        DrawHelper.drawTextShadow(str(len(self.cards)), 20, 360, (255, 255, 255), display, font['normal'])
 
 
         strCopyright = '2020 Levi D. Smith'
 #        c = (255, 255, 255)
 #        text = font.render(strCopyright, True, c)
 #        display.blit(text, (1000, 680))
-        DrawHelper.drawTextShadow(strCopyright, 500, 720-32, (255, 255, 255), display, font[1])
+        DrawHelper.drawTextShadow(strCopyright, 500, 720-32, (255, 255, 255), display, font['normal'])
 
     def doNextPlayer(self):
         self.iCurrentPlayer += 1
@@ -391,11 +395,11 @@ class GameManager(Screen):
 
     def setCardPositions(self):
         i = 0
-        iCardsPerRow = math.ceil(len(self.table) / 2)
+        iCardsPerRow = math.ceil(len(self.table.cards) / 2)
 #        iTableCardCount = 10
         
-        for card in self.table:
-            card.targetPosition = (self.table_position[0] + ((i % iCardsPerRow) * 80), self.table_position[1] + 160 * math.floor(i / iCardsPerRow))
+        for card in self.table.cards:
+            card.targetPosition = (self.table.position[0] + ((i % iCardsPerRow) * 80), self.table.position[1] + 160 * math.floor(i / iCardsPerRow))
             i += 1
             
         for card in self.cards:
@@ -459,7 +463,7 @@ class GameManager(Screen):
         
     def arrangeCards(self):
         print("arrangeCards")
-        self.table.sort(key=attrgetter('iMonth'))
+        self.table.cards.sort(key=attrgetter('iMonth'))
         self.setCardPositions()
         
         for player in self.players:
@@ -505,7 +509,7 @@ class GameManager(Screen):
             self.isCursorHovered = self.isCursorHovered or button.isHovered(x, y)
 
     def checkCardsHover(self, x, y):
-        for card in self.table:
+        for card in self.table.cards:
             self.isCursorHovered = self.isCursorHovered or card.isHovered(x, y)
 
         for card in self.cards:
@@ -521,6 +525,11 @@ class GameManager(Screen):
         
             for card in player.match_cards:
                 self.isCursorHovered = self.isCursorHovered or card.isHovered(x, y)
+
+        #check table hovered
+        self.table.isSelected = False
+        if (not self.isCursorHovered):
+            self.isCursorHovered = self.isCursorHovered or self.table.isHovered(x, y)
     
     
     def continuePrompt(self):

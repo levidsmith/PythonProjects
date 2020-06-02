@@ -29,9 +29,12 @@ class Application:
         pygame.init()
         display = pygame.display.set_mode(Globals.SCREEN_SIZE)
         pygame.display.set_caption('Hanafuda Koi Koi')
-        font = []
-        font.append(pygame.font.Font("Aerovias Brasil NF.ttf", 20))
-        font.append(pygame.font.Font("Aerovias Brasil NF.ttf", 32))
+        font = {}
+        font['small'] = pygame.font.Font("fonts/Seven Swordsmen BB.ttf", 20)
+        font['normal'] = pygame.font.Font("fonts/Seven Swordsmen BB.ttf", 32)
+        font['title'] = pygame.font.Font("fonts/Seven Swordsmen BB.ttf", 128)
+#        font.append(pygame.font.Font("Aerovias Brasil NF.ttf", 20))
+#        font.append(pygame.font.Font("Aerovias Brasil NF.ttf", 32))
 
 
 

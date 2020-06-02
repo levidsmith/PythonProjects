@@ -17,7 +17,7 @@ class Player:
     STEP_DONE = 3
     STEP_HAND_MATCH_CONTINUE = 4
     STEP_DRAW_MATCH_CONTINUE = 5
-    STEP_NAMES = ("Hand Match or Discard", "Draw", "Draw Match or Discard", "Done", "Continue to Draw", "Continue to Done")
+    STEP_NAMES = ("Hand Match or Discard to table", "Draw", "Draw Match or Discard to table", "Done", "Continue to Draw", "Continue to Done")
     
     MATCH_CARDS_PER_ROW = 8
     
@@ -66,18 +66,23 @@ class Player:
 
         c = (255, 255, 255)
         c_bkg = (0, 0, 0)
+
+
         if (self.isPlayerTurn):
             c = (255, 255, 0)
-            pygame.draw.rect(display, c_bkg, (self.position[0], self.position[1] + 128 + 4, 128, 32))
+#            pygame.draw.rect(display, c_bkg, (self.position[0], self.position[1] + 128 + 4, 128, 32))
             
 #        text = font.render(self.name, True, c, c_bkg)
 #        display.blit(text, self.position)
-        DrawHelper.drawTextShadow(self.name, self.position[0], self.position[1] + 128, (255, 255, 255), display, font[1])
+        DrawHelper.drawTextShadow(self.name, self.position[0] + 48, self.position[1] + 128, c, display, font['normal'])
 #        if (self.isPlayerTurn):
-        DrawHelper.drawTextShadow(str(self.iStep) + ": " + Player.STEP_NAMES[self.iStep], self.position[0], self.position[1] + 128 + 32, (0, 255, 255), display, font[1])
-        DrawHelper.drawTextShadow(self.score.card_type_totals_text, self.position[0] + self.card_types_offset[0], self.position[1] + self.card_types_offset[1], (255, 255, 255), display, font[0])
+#        DrawHelper.drawTextShadow(str(self.iStep) + ": " + Player.STEP_NAMES[self.iStep], self.position[0], self.position[1] + 128 + 32, (0, 255, 255), display, font['normal'])
+        if (self.isPlayerTurn):
+            DrawHelper.drawTextShadow(Player.STEP_NAMES[self.iStep], self.position[0], self.position[1] + 128 + 32, (0, 255, 255), display, font['small'])
+        
+        DrawHelper.drawTextShadow(self.score.card_type_totals_text, self.position[0] + self.card_types_offset[0], self.position[1] + self.card_types_offset[1], (255, 255, 255), display, font['small'])
 
-        DrawHelper.drawTextShadow(self.score.score_text, self.position[0] + self.score_offset[0], self.position[1] + self.score_offset[1], (255, 255, 255), display, font[0])
+        DrawHelper.drawTextShadow(self.score.score_text, self.position[0] + self.score_offset[0], self.position[1] + self.score_offset[1], (255, 255, 255), display, font['small'])
 
 
         
@@ -87,9 +92,11 @@ class Player:
             iMatchScore += iScore
             strRoundsScore += str(iScore) + ","
             
-        strRoundsScore += " Total = " + str(iMatchScore)
+#        strRoundsScore += " Total = " + str(iMatchScore)
+        strMatchScore = str(iMatchScore)
 
-        DrawHelper.drawTextShadow(strRoundsScore, self.position[0] + 140, self.position[1] + 140, (255, 255, 255), display, font[0])
+#        DrawHelper.drawTextShadow(strRoundsScore, self.position[0] + 140, self.position[1] + 140, (255, 255, 255), display, font['small'])
+        DrawHelper.drawTextShadow(strMatchScore, self.position[0], self.position[1] + 128, (255, 128, 0), display, font['normal'])
             
             
             
@@ -132,7 +139,7 @@ class Player:
         match_card2 = None
 
         for card_hand in self.cards:
-            for card_table in self.gamemanager.table:
+            for card_table in self.gamemanager.table.cards:
                 if (card_hand.iMonth == card_table.iMonth):
                     match_card1 = card_hand
                     match_card2 = card_table
@@ -159,7 +166,7 @@ class Player:
         match_card = None
         draw_card = self.gamemanager.draw_card
 
-        for card_table in self.gamemanager.table:
+        for card_table in self.gamemanager.table.cards:
             if (draw_card.iMonth == card_table.iMonth):
                 match_card = card_table
                     
@@ -200,11 +207,11 @@ class Player:
             if (len(possible_matches) == 3):  #handle the special case of three matching cards
                 for card in possible_matches:
                     self.match_cards.append(card)
-                    self.gamemanager.table.remove(card)
+                    self.gamemanager.table.cards.remove(card)
 
             else:
                 self.match_cards.append(match_card2)
-                self.gamemanager.table.remove(match_card2)
+                self.gamemanager.table.cards.remove(match_card2)
 
 
             self.score.checkScore(self.match_cards)
@@ -219,7 +226,7 @@ class Player:
     
     def getPossibleMatches(self, match_card):
         possible_matches = []
-        for card in self.gamemanager.table:
+        for card in self.gamemanager.table.cards:
             if (match_card.iMonth == card.iMonth):
                 possible_matches.append(card)
         return possible_matches
@@ -263,7 +270,7 @@ class Player:
       
     def doDiscard(self, card):
         card.isHidden = False
-        self.gamemanager.table.append(card)
+        self.gamemanager.table.cards.append(card)
         self.gamemanager.setCardPositions()
         if (card in self.cards):
             self.cards.remove(card)
@@ -359,7 +366,7 @@ class Player:
         if (self.selectedCard != None):
 
             landedCard = None
-            for card in self.gamemanager.table:
+            for card in self.gamemanager.table.cards:
                 if (self.gamemanager.isCardAtPosition(card, x, y)):
                     landedCard = card
                 
@@ -380,10 +387,15 @@ class Player:
                         self.selectedCard.targetPosition = self.selectedCard.previousPosition
                         self.selectedCard = None
                 else:
-                    self.doDiscard(self.selectedCard)
-                    self.selectedCard = None
-                    self.gamemanager.setCardPositions()
-                    self.iStep = Player.STEP_DRAW
+                    if (self.gamemanager.table.isSelected):
+                        self.doDiscard(self.selectedCard)
+                        self.selectedCard = None
+                        self.gamemanager.setCardPositions()
+                        self.iStep = Player.STEP_DRAW
+                    else:
+                        self.selectedCard.targetPosition = self.selectedCard.previousPosition
+                        self.selectedCard = None
+ #                       self.gamemanager.setCardPositions()
 
 
             elif (self.iStep == Player.STEP_DRAW_MATCH):
@@ -402,11 +414,14 @@ class Player:
                         self.selectedCard = None
                 
                 else:
-                    self.doDiscard(self.selectedCard)
-                    
-#                    self.selectedCard.targetPosition = self.selectedCard.previousPosition
-                    self.selectedCard = None
-                    self.iStep = Player.STEP_DONE
+                    if (self.gamemanager.table.isSelected):
+                        self.doDiscard(self.selectedCard)
+                        self.selectedCard = None
+                        self.iStep = Player.STEP_DONE
+                    else:
+                        self.selectedCard.targetPosition = self.selectedCard.previousPosition
+                        self.selectedCard = None
+#                        self.gamemanager.setCardPositions()
                 
         
     def dragCard(self, x, y):

@@ -21,7 +21,7 @@ class Button:
         print("drawbutton")
         if (not self.isHidden):
             pygame.draw.rect(display, self.bkg_color, [self.x, self.y, self.w, self.h])
-            DrawHelper.drawTextShadow(self.strLabel, self.x, self.y, (255, 255, 255), display, font[1])
+            DrawHelper.drawTextShadow(self.strLabel, self.x, self.y, (255, 255, 255), display, font['normal'])
         
     def isClicked(self, x, y):
         if (not self.isHidden):

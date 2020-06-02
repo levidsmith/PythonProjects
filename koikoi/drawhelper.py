@@ -5,6 +5,7 @@ class DrawHelper:
 
     def drawTextShadow(str, x, y, c, display, font):
         iVerticalOffset = 0
+        dimensions = []
         
 
         for strLine in str.splitlines():
@@ -14,6 +15,11 @@ class DrawHelper:
             text = font.render(strLine, True, c)
             display.blit(text, (x, y + iVerticalOffset))
             iVerticalOffset += font.size(strLine)[1]
+
+    def getTextSize(str, font):
+        return font.size(str)
+        
+
 
         
     
