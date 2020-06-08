@@ -19,8 +19,6 @@ class GameManager(Screen):
     WAIT_DELAY = 60 * 2
 
     players = []
-#    cards = []
-#    table = []
     draw_card = None
     
     card_images = []
@@ -33,12 +31,13 @@ class GameManager(Screen):
     
     deck_position = (64, 296)
     draw_card_position = (256, 296)
-#    table_position = (400, 200)
     
-    buttons = []
+#    buttons = []
     
     def __init__(self, init_application):
-        self.iTotalRounds = 6
+        super().__init__()
+
+#        self.iTotalRounds = 6
         self.application = init_application
         self.cards = []
         self.table = Table()
@@ -69,7 +68,6 @@ class GameManager(Screen):
         self.buttons.append(b)
 
         b = Button("Quit", 1100, 688)
-#        b.action = self.application.doQuit()
         b.action = self.doReturnToTitle
         b.show()
         self.buttons.append(b)
@@ -84,7 +82,6 @@ class GameManager(Screen):
                 if (os.path.isfile(strFile)):
                     img = pygame.image.load(strFile)
                     img = pygame.transform.scale(img, (Card.w, Card.h))
-                    #self.card_images[(i * 4) + j] = img
                     self.card_images.append(img)
 
 
@@ -118,7 +115,7 @@ class GameManager(Screen):
     
         for i in range(12):
             for j in range(4):
-                card = Card((i * 4) + j,  i * 80, j * 150)
+                card = Card((i * 4) + j,  i * 80, j * 150, self.application)
                 card.iMonth = i
                 card.img = self.card_images[(i * 4) + j]
                 card.img_back = self.card_back_images[0]
@@ -223,20 +220,14 @@ class GameManager(Screen):
         p1.score_offset = (900, -20)
         p1.card_types_offset = (1040, -20)
         p1.match_card_position = (660, 0)
-#        for i in range(8):
-#            draw_card = self.cards.pop()
-#            draw_card.x = 0
-#            draw_card.y = p1.position[1]
-#            draw_card.targetPosition = (p1.position[0] + (i * 80), p1.position[1])
-#            p1.cards.append(draw_card)
-
         self.players.append(p1)
     
 
 
 
         p2 = Player(self)
-        p2.name = "Player"
+#        p2.name = "Player"
+        p2.name = self.application.options.strName
         p2.isHidden = False
         p2.isHuman = True
         p2.position = (64, 512)
@@ -284,8 +275,9 @@ class GameManager(Screen):
     def nextRound(self):
         self.iRound += 1
 
-        if (self.iRound >= self.iTotalRounds):
-            self.application.loadScreen("gameover")
+#        if (self.iRound >= self.iTotalRounds):
+        if (self.iRound >= self.application.options.iTotalRounds):
+            self.application.loadScreen("gamecomplete")
 
             
 
@@ -299,14 +291,6 @@ class GameManager(Screen):
                 self.cards.append(card)
 
         
-#            for c in player.cards:
-#                self.cards.append(c)
-#                player.cards.remove(c)
-
-#            for c in player.match_cards:
-#                self.cards.append(c)
-#                player.match_cards.remove(c)
-                
             player.setCardPositions()
             player.nextRound()
 
@@ -315,9 +299,6 @@ class GameManager(Screen):
             card = self.table.cards.pop()
             self.cards.append(card)
 
-#        for card in self.table:
-#            self.cards.append(card)
-#            self.table.remove(card)
             
         for card in self.cards:
             card.isHidden = True
@@ -373,9 +354,6 @@ class GameManager(Screen):
 
 
         strCopyright = '2020 Levi D. Smith'
-#        c = (255, 255, 255)
-#        text = font.render(strCopyright, True, c)
-#        display.blit(text, (1000, 680))
         DrawHelper.drawTextShadow(strCopyright, 500, 720-32, (255, 255, 255), display, font['normal'])
 
     def doNextPlayer(self):
@@ -396,7 +374,6 @@ class GameManager(Screen):
     def setCardPositions(self):
         i = 0
         iCardsPerRow = math.ceil(len(self.table.cards) / 2)
-#        iTableCardCount = 10
         
         for card in self.table.cards:
             card.targetPosition = (self.table.position[0] + ((i % iCardsPerRow) * 80), self.table.position[1] + 160 * math.floor(i / iCardsPerRow))
@@ -412,18 +389,18 @@ class GameManager(Screen):
 
 
     def mousePressed(self, mousePosition):
-        mouseX = mousePosition[0]
-        mouseY = mousePosition[1]
-#        self.selectCard(mouseX, mouseY)
+        super().mousePressed(mousePosition)
+#        mouseX = mousePosition[0]
+#        mouseY = mousePosition[1]
         currentPlayer = self.players[self.iCurrentPlayer]
-        currentPlayer.mousePressed(mouseX, mouseY)
+#        currentPlayer.mousePressed(mouseX, mouseY)
+        currentPlayer.mousePressed(mousePosition[0], mousePosition[1])
 
-        self.checkButtonsPress(mouseX, mouseY)
+#        self.checkButtonsPress(mouseX, mouseY)
     
     def mouseReleased(self, mousePosition):
         mouseX = mousePosition[0]
         mouseY = mousePosition[1]
-#        self.dropCard(mouseX, mouseY)
         currentPlayer = self.players[self.iCurrentPlayer]
         currentPlayer.mouseReleased(mouseX, mouseY)
 
@@ -498,11 +475,11 @@ class GameManager(Screen):
         
         self.nextRound()
         
-    def checkButtonsPress(self, x, y):
-        for button in self.buttons:
-            if (button.isClicked(x, y)):
-                print(button.strLabel + " button clicked")
-                button.action()
+#    def checkButtonsPress(self, x, y):
+#        for button in self.buttons:
+#            if (button.isClicked(x, y)):
+#                print(button.strLabel + " button clicked")
+#                button.action()
                 
     def checkButtonsHover(self, x, y):
         for button in self.buttons:

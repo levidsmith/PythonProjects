@@ -8,7 +8,9 @@ from card import Card
 from player import Player
 from gamemanager import GameManager
 from screen_title import ScreenTitle
-from screen_gameover import ScreenGameOver
+from screen_gamecomplete import ScreenGameComplete
+from screen_options import ScreenOptions
+from options import Options
 from globals import Globals
 
 class Application:
@@ -42,21 +44,26 @@ class Application:
             print("Disable Music")
             gamemanager.set_audio_volume(0)
 
-    
 
+        
         #make array of screens
         self.screens = {}
 
         screenTitle = ScreenTitle(self)
         self.screens["title"] = screenTitle
 
+        self.options = Options()
+        screenOptions = ScreenOptions(self)
+        self.screens["options"] = screenOptions
+
         gamemanager = GameManager(self)
         self.screens["gamemanager"] = gamemanager
 
-        screenGameOver = ScreenGameOver(self)
-        self.screens["gameover"] = screenGameOver
+        screenGameComplete = ScreenGameComplete(self)
+        self.screens["gamecomplete"] = screenGameComplete
 
-        self.currentScreen = self.screens["title"]
+#        self.currentScreen = self.screens["title"]
+        self.currentScreen = self.screens["gamecomplete"]
 
 
         clock = pygame.time.Clock()
@@ -67,21 +74,21 @@ class Application:
                 if (event.type == pygame.QUIT):
                     self.keepLooping = False
                 elif event.type == pygame.KEYDOWN:
-                    if (event.key == pygame.K_ESCAPE or event.key == pygame.K_q):
-                        self.keepLooping = False
-#                    if (event.key == pygame.K_d):
-#                        gamemanager.restart()
-                    if (event.key == pygame.K_m):
-                        gamemanager.set_audio_volume(0)
+#                    if (event.key == pygame.K_ESCAPE or event.key == pygame.K_q):
+#                        self.keepLooping = False
+                    if (event.key >= pygame.K_a and event.key <= pygame.K_z):
+                        self.currentScreen.keyInputChar(chr(event.key))
+                    if (event.key == pygame.K_DELETE or event.key == pygame.K_BACKSPACE):
+                        self.currentScreen.keyInputDelete()
+
+#                    if (event.key == pygame.K_m):
+#                        gamemanager.set_audio_volume(0)
                     
                 elif event.type == pygame.MOUSEBUTTONDOWN:
-                    #gamemanager.mousePressed(pygame.mouse.get_pos())
                     self.currentScreen.mousePressed(pygame.mouse.get_pos())
                 elif event.type == pygame.MOUSEBUTTONUP:
-                    #gamemanager.mouseReleased(pygame.mouse.get_pos())
                     self.currentScreen.mouseReleased(pygame.mouse.get_pos())
                 elif event.type == pygame.MOUSEMOTION:
-                    #gamemanager.mouseMoved(pygame.mouse.get_pos())
                     self.currentScreen.mouseMoved(pygame.mouse.get_pos())
     
 
@@ -97,5 +104,4 @@ class Application:
 
 
 
-#main()
 application = Application()

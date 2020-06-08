@@ -11,21 +11,29 @@ class Button:
         self.w = 128
         self.h = 32
         self.action = None
+        self.action_params = None
         self.bkg_color_normal = (0, 0, 0)
         self.bkg_color_highlight = (0, 0, 255)
         self.bkg_color = self.bkg_color_normal
         self.isHidden = False
+
+#        self.isToggle = False
+#        self.isSelected = False
         
         
     def draw(self, display, font):
-        print("drawbutton")
+#        print("drawbutton")
         if (not self.isHidden):
+            c = (255, 255, 255)
+#            if (self.isToggle and self.isSelected):
+#                c = (255, 255, 0)
             pygame.draw.rect(display, self.bkg_color, [self.x, self.y, self.w, self.h])
-            DrawHelper.drawTextShadow(self.strLabel, self.x, self.y, (255, 255, 255), display, font['normal'])
+            DrawHelper.drawTextShadow(self.strLabel, self.x, self.y, c, display, font['normal'])
         
     def isClicked(self, x, y):
         if (not self.isHidden):
             if (x > self.x and x < self.x + self.w and y > self.y and y < self.y + self.h):
+                self.isSelected = True
                 return True
             else:
                 return False

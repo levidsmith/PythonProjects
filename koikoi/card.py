@@ -36,10 +36,11 @@ class Card:
     targetPosition = (0, 0)
     previousPosition = (0, 0)
 	
-    def __init__(self, init_id, init_x, init_y):
+    def __init__(self, init_id, init_x, init_y, init_application):
         self.id = init_id
         self.x = init_x
         self.y = init_y
+        self.application = init_application
         
     def draw(self, display, font):
         c = (128, 128, 128)
@@ -55,46 +56,48 @@ class Card:
             c_black = (0, 0, 0)
         
 #Display month
-            c = (255, 255, 255)
-            text = font['normal'].render(str(self.iMonth + 1), True, c, c_black)
-            display.blit(text, (self.x, self.y))
+            if (self.application.options.showMonth):
+                c = (255, 255, 255)
+                text = font['normal'].render(str(self.iMonth + 1), True, c, c_black)
+                display.blit(text, (self.x, self.y))
         
             iLineSpacing = 32
 
 #Display attribute
-            if (self.isLight):
-                c = (255, 255, 0)
-                text = font['normal'].render("L", True, c, c_black)
-                display.blit(text, (self.x, self.y + iLineSpacing))
+            if (self.application.options.showCardType):
+                if (self.isLight):
+                    c = (255, 255, 0)
+                    text = font['normal'].render("L", True, c, c_black)
+                    display.blit(text, (self.x, self.y + iLineSpacing))
 
         
-            if (self.isRedRibbon):
-                c = (255, 0, 0)
-                if (self.isPoetryRibbon):
-                    text = font['normal'].render("RPR", True, c, c_black)
-                else:
-                    text = font['normal'].render("RR", True, c, c_black)
-                display.blit(text, (self.x, self.y + iLineSpacing))
+                if (self.isRedRibbon):
+                    c = (255, 0, 0)
+                    if (self.isPoetryRibbon):
+                        text = font['normal'].render("RPR", True, c, c_black)
+                    else:
+                        text = font['normal'].render("RR", True, c, c_black)
+                    display.blit(text, (self.x, self.y + iLineSpacing))
         
-            if (self.isBlueRibbon):
-                c = (128, 128, 255)
-                text = font['normal'].render("BR", True, c, c_black)
-                display.blit(text, (self.x, self.y + iLineSpacing))
+                if (self.isBlueRibbon):
+                    c = (128, 128, 255)
+                    text = font['normal'].render("BR", True, c, c_black)
+                    display.blit(text, (self.x, self.y + iLineSpacing))
 
-            if (self.isSpecial):
-                c = (255, 128, 0)
-                text = font['normal'].render("S", True, c, c_black)
-                display.blit(text, (self.x, self.y + iLineSpacing))
+                if (self.isSpecial):
+                    c = (255, 128, 0)
+                    text = font['normal'].render("S", True, c, c_black)
+                    display.blit(text, (self.x, self.y + iLineSpacing))
 
-            if (self.isSakeCup):
-                c = (255, 128, 0)
-                text = font['normal'].render("SC", True, c, c_black)
-                display.blit(text, (self.x, self.y + iLineSpacing))
+                if (self.isSakeCup):
+                    c = (255, 128, 0)
+                    text = font['normal'].render("SC", True, c, c_black)
+                    display.blit(text, (self.x, self.y + iLineSpacing))
 
-            if (self.isRainMan):
-                c = (255, 128, 0)
-                text = font['normal'].render("RM", True, c, c_black)
-                display.blit(text, (self.x, self.y + iLineSpacing))
+                if (self.isRainMan):
+                    c = (255, 128, 0)
+                    text = font['normal'].render("RM", True, c, c_black)
+                    display.blit(text, (self.x, self.y + iLineSpacing))
 
     def update(self):
         iSpeed = self.MOVE_SPEED

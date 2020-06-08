@@ -10,6 +10,8 @@ class ScreenTitle(Screen):
 
 
     def __init__(self, init_application):
+        super().__init__()
+
         print("init")
         self.application = init_application
         self.makeButtons()
@@ -21,11 +23,10 @@ class ScreenTitle(Screen):
 
     def load_images(self):
         self.imgBackground = pygame.image.load('images/background_title.jpg')
-#        self.imgBackground = pygame.transform.scale(self.imgBackground, (, 480))
 
 
     def makeButtons(self):
-        self.buttons = []
+#        self.buttons = []
         iOffset = ((Globals.SCREEN_SIZE[0] - (128 * 3)) / 2) + (128 * 0)
         b = Button("Start", iOffset, 500)
         b.action = self.doStart
@@ -43,7 +44,6 @@ class ScreenTitle(Screen):
 #        print("update")
         None
         self.iBackgroundScale += 0.1 * (1/60)
-#        self.imgBackground = pygame.transform.scale(self.imgBackground, (int(Globals.SCREEN_SIZE[0] * self.iBackgroundScale), int(Globals.SCREEN_SIZE[1] * self.iBackgroundScale)))
 
 
 
@@ -53,8 +53,6 @@ class ScreenTitle(Screen):
         display.blit(self.imgBackground, (0, 0))
 
 
-#        c = (64, 32, 0)
-#        pygame.draw.rect(display, c, (0, 0, Globals.SCREEN_SIZE[0], Globals.SCREEN_SIZE[1]))
 
         strTitle = "PyKoiKoi"
         iOffset = (Globals.SCREEN_SIZE[0] -  DrawHelper.getTextSize(strTitle, font['title'])[0]) / 2
@@ -69,11 +67,11 @@ class ScreenTitle(Screen):
 
 
 
-    def mousePressed(self, mousePosition):
-        mouseX = mousePosition[0]
-        mouseY = mousePosition[1]
+#    def mousePressed(self, mousePosition):
+#        mouseX = mousePosition[0]
+#        mouseY = mousePosition[1]
 
-        self.checkButtonsPress(mouseX, mouseY)
+#        self.checkButtonsPress(mouseX, mouseY)
     
     def mouseReleased(self, mousePosition):
         mouseX = mousePosition[0]
@@ -95,11 +93,11 @@ class ScreenTitle(Screen):
                 pygame.mouse.set_cursor(*pygame.cursors.arrow)
 
         
-    def checkButtonsPress(self, x, y):
-        for button in self.buttons:
-            if (button.isClicked(x, y)):
-                print(button.strLabel + " button clicked")
-                button.action()
+#    def checkButtonsPress(self, x, y):
+#        for button in self.buttons:
+#            if (button.isClicked(x, y)):
+#                print(button.strLabel + " button clicked")
+#                button.action()
     
     def checkButtonsHover(self, x, y):
         for button in self.buttons:
@@ -107,7 +105,7 @@ class ScreenTitle(Screen):
 
     
     def doStart(self):
-        self.application.loadScreen("gamemanager")
+        self.application.loadScreen("options")
 
 
     def doQuit(self):
