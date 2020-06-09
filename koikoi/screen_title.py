@@ -77,20 +77,20 @@ class ScreenTitle(Screen):
         mouseX = mousePosition[0]
         mouseY = mousePosition[1]
         
-    def mouseMoved(self, mousePosition):
-        mouseX = mousePosition[0]
-        mouseY = mousePosition[1]
+#    def mouseMoved(self, mousePosition):
+#        mouseX = mousePosition[0]
+#        mouseY = mousePosition[1]
         
-        isHovered = self.isCursorHovered
-        self.isCursorHovered = False #Set cursor hovered to false, and then set it to true if any cards or buttons are hovered
+#        isHovered = self.isCursorHovered
+#        self.isCursorHovered = False #Set cursor hovered to false, and then set it to true if any cards or buttons are hovered
 
 
-        self.checkButtonsHover(mouseX, mouseY)
-        if (isHovered != self.isCursorHovered):
-            if (self.isCursorHovered):
-                pygame.mouse.set_cursor(*pygame.cursors.diamond)
-            else:
-                pygame.mouse.set_cursor(*pygame.cursors.arrow)
+#        self.checkButtonsHover(mouseX, mouseY)
+#        if (isHovered != self.isCursorHovered):
+#            if (self.isCursorHovered):
+#                pygame.mouse.set_cursor(*pygame.cursors.diamond)
+#            else:
+#                pygame.mouse.set_cursor(*pygame.cursors.arrow)
 
         
 #    def checkButtonsPress(self, x, y):
@@ -99,9 +99,9 @@ class ScreenTitle(Screen):
 #                print(button.strLabel + " button clicked")
 #                button.action()
     
-    def checkButtonsHover(self, x, y):
-        for button in self.buttons:
-            self.isCursorHovered = self.isCursorHovered or button.isHovered(x, y)
+#    def checkButtonsHover(self, x, y):
+#        for button in self.buttons:
+#            self.isCursorHovered = self.isCursorHovered or button.isHovered(x, y)
 
     
     def doStart(self):

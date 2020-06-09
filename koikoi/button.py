@@ -38,7 +38,7 @@ class Button:
             else:
                 return False
 
-    def isHovered(self, x, y):        
+    def checkHovered(self, x, y):        
         if (not self.isHidden):
             if (x > self.x and x < self.x + self.w and y > self.y and y < self.y + self.h):
                 self.bkg_color = self.bkg_color_highlight

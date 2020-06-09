@@ -22,11 +22,12 @@ class Card:
     img = None
     img_back = None
     img_border = None
+    surface_highlight = None
+    
     
     isHidden = True
     
-#    isDragged = False
-    
+  
     x = 0
     y = 0
     w = 64
@@ -41,6 +42,7 @@ class Card:
         self.x = init_x
         self.y = init_y
         self.application = init_application
+        self.isHovered = False
         
     def draw(self, display, font):
         c = (128, 128, 128)
@@ -52,9 +54,17 @@ class Card:
         elif (self.img != None):
             display.blit(self.img, (self.x, self.y, self.w, self.h))
             display.blit(self.img_border, (self.x, self.y, self.w, self.h))
-        
+
+            if (self.isHovered):
+                c = (128, 0, 0)
+#                pygame.draw.rect(display, c, (self.x, self.y, self.w, self.h))
+#                display.blit(self.application.gamemanager.surface_card_highlight, (0, ))
+                display.blit(self.surface_highlight, (self.x, self.y))
+
+
+
             c_black = (0, 0, 0)
-        
+       
 #Display month
             if (self.application.options.showMonth):
                 c = (255, 255, 255)
@@ -74,9 +84,9 @@ class Card:
                 if (self.isRedRibbon):
                     c = (255, 0, 0)
                     if (self.isPoetryRibbon):
-                        text = font['normal'].render("RPR", True, c, c_black)
+                        text = font['normal'].render("PR", True, c, c_black)
                     else:
-                        text = font['normal'].render("RR", True, c, c_black)
+                        text = font['normal'].render("R", True, c, c_black)
                     display.blit(text, (self.x, self.y + iLineSpacing))
         
                 if (self.isBlueRibbon):
@@ -135,11 +145,13 @@ class Card:
         return "Card ID: " + str(self.id) + " Month: " + str(self.iMonth)
         
         
-    def isHovered(self, x, y):
+    def checkHovered(self, x, y):
         if (x > self.x and x < self.x + self.w and y > self.y and y < self.y + self.h):
 #            pygame.mouse.set_cursor(*pygame.cursors.diamond)
+            self.isHovered = True
             return True
         else:
+            self.isHovered = False
             return False
 
     

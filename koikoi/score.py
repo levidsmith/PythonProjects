@@ -21,6 +21,7 @@ class Score:
         self.score_text = "Scores"
         self.card_type_totals_text = ""
         self.hasNewScore = False
+        self.isKoi = False
     
     
     def checkScore(self, cards):
@@ -91,8 +92,8 @@ class Score:
         if (iRibbons > 0): 
             self.card_type_totals_text += "Ribbons " + str(iRibbons) + "\n"
 
-        if (iRedRibbons > 0): 
-            self.card_type_totals_text += "Red Ribbons " + str(iRedRibbons) + "\n"
+#        if (iRedRibbons > 0): 
+#            self.card_type_totals_text += "Red Ribbons " + str(iRedRibbons) + "\n"
 
         if (iBlueRibbons > 0): 
             self.card_type_totals_text += "Blue Ribbons " + str(iBlueRibbons) + "\n"
@@ -104,7 +105,7 @@ class Score:
             self.card_type_totals_text += "Specials " + str(iSpecials) + "\n"
 
         if (iBoarDeerButterfly > 0): 
-            self.card_type_totals_text += "B,D,BF " + str(iBoarDeerButterfly) + "\n"
+            self.card_type_totals_text += "BDB " + str(iBoarDeerButterfly) + "\n"
 
 
         if (iNormals > 0): 

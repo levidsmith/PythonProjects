@@ -62,8 +62,8 @@ class Application:
         screenGameComplete = ScreenGameComplete(self)
         self.screens["gamecomplete"] = screenGameComplete
 
-#        self.currentScreen = self.screens["title"]
-        self.currentScreen = self.screens["gamecomplete"]
+        self.currentScreen = self.screens["title"]
+#        self.currentScreen = self.screens["gamecomplete"]
 
 
         clock = pygame.time.Clock()

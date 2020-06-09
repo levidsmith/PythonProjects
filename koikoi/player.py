@@ -5,6 +5,7 @@ import math
 from card import Card
 from score import Score
 from drawhelper import DrawHelper
+from random import randrange
 
 
 class Player:
@@ -34,6 +35,7 @@ class Player:
         self.isHuman = False
         self.iStep = Player.STEP_HAND_MATCH
         self.selectedCard = None
+        self.selectedOffset = (0, 0)
     
     def update(self):
         for card in self.cards:
@@ -81,6 +83,10 @@ class Player:
         strMatchScore = str(iMatchScore)
 
         DrawHelper.drawTextShadow(strMatchScore, self.position[0], self.position[1] + 128, (255, 128, 0), display, font['normal'])
+
+        if (self.score.isKoi):
+            DrawHelper.drawTextShadow("KOI", self.position[0] + 200, self.position[1] + 128, (255, 0, 0), display, font['normal'])
+
             
             
             
@@ -167,7 +173,12 @@ class Player:
 
     def checkContinueCPU(self):
         #We should have fancy AI here to figure out if they should continue
-        self.gamemanager.doContinue()
+        iRand = randrange(1, 100)
+        print("Random choice value is " + str(iRand))
+        if (iRand < 50):
+            self.gamemanager.doContinue()
+        else:
+            self.gamemanager.doStop()
     
 
     def doMatch(self, match_card1, match_card2):
@@ -262,6 +273,7 @@ class Player:
 
         
     def doContinue(self):
+        self.score.isKoi = True
         if (self.iStep == Player.STEP_HAND_MATCH_CONTINUE):
             self.score.hasNewScore = False
             self.iStep = Player.STEP_DRAW
@@ -290,9 +302,7 @@ class Player:
         if (self.iStep == Player.STEP_HAND_MATCH):
             for card in self.cards:
                 if (self.gamemanager.isCardAtPosition(card, x, y)):
-                    print("Selected card " + str(card))
-                    self.selectedCard = card
-                    self.selectedCard.previousPosition = (self.selectedCard.x, self.selectedCard.y)
+                    self.selectCard(card, x, y)
 
 
 
@@ -304,9 +314,7 @@ class Player:
             if (self.gamemanager.draw_card != None):
                 card = self.gamemanager.draw_card
                 if (self.gamemanager.isCardAtPosition(card, x, y)):
-                    print("Selected card " + str(card))
-                    self.selectedCard = card
-                    self.selectedCard.previousPosition = (self.selectedCard.x, self.selectedCard.y)
+                    self.selectCard(card, x, y)
                     
 
     def mouseReleased(self, x, y):
@@ -371,7 +379,12 @@ class Player:
         
     def dragCard(self, x, y):
         if (not self.selectedCard == None):
-            self.selectedCard.x = x
-            self.selectedCard.y = y
-            self.selectedCard.targetPosition = (x, y)
+            self.selectedCard.x = x - self.selectedOffset[0]
+            self.selectedCard.y = y - self.selectedOffset[1]
+            self.selectedCard.targetPosition = (x - self.selectedOffset[0], y - self.selectedOffset[1])
 
+    def selectCard(self, card, xPress, yPress):
+        print("Selected card " + str(card))
+        self.selectedOffset = (xPress - card.x, yPress - card.y)
+        self.selectedCard = card
+        self.selectedCard.previousPosition = (self.selectedCard.x, self.selectedCard.y)

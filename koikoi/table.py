@@ -23,7 +23,7 @@ class Table:
 
 
 
-    def isHovered(self, x, y):
+    def checkHovered(self, x, y):
         if (x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]):
             self.isSelected = True
             return True

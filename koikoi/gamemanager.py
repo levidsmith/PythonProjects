@@ -18,11 +18,11 @@ class GameManager(Screen):
 
     WAIT_DELAY = 60 * 2
 
-    players = []
-    draw_card = None
+#    players = []
+#    draw_card = None
     
-    card_images = []
-    card_back_images = []
+#    card_images = []
+#    card_back_images = []
     sound_effects = {}
     
     background = []
@@ -39,6 +39,7 @@ class GameManager(Screen):
 
 #        self.iTotalRounds = 6
         self.application = init_application
+        self.players = []
         self.cards = []
         self.table = Table()
         self.load_images()
@@ -75,6 +76,8 @@ class GameManager(Screen):
 
     
     def load_images(self):
+        self.card_images = []
+        self.card_back_images = []
         for i in range(12):
             for j in range(4):
                 print(str(i) + ", " + str(j))
@@ -91,6 +94,10 @@ class GameManager(Screen):
 
         img = pygame.image.load('images/card_border.png')
         self.card_back_images.append(img)
+
+        self.surface_card_highlight = pygame.Surface((64, 128))
+        self.surface_card_highlight.set_alpha(128)
+        self.surface_card_highlight.fill((255, 0, 0))
 
 
         imgBackground = pygame.image.load('images/background_game.jpg')
@@ -120,6 +127,7 @@ class GameManager(Screen):
                 card.img = self.card_images[(i * 4) + j]
                 card.img_back = self.card_back_images[0]
                 card.img_border = self.card_back_images[1]
+                card.surface_highlight = self.surface_card_highlight
 
                 if (i == 0):
                     if (j == 2):
@@ -412,10 +420,14 @@ class GameManager(Screen):
         isHovered = self.isCursorHovered
         self.isCursorHovered = False #Set cursor hovered to false, and then set it to true if any cards or buttons are hovered
 
+        super().mouseMoved(mousePosition)
+
         currentPlayer = self.players[self.iCurrentPlayer]
         currentPlayer.dragCard(mouseX, mouseY)
         
-        self.checkButtonsHover(mouseX, mouseY)
+#        self.checkButtonsHover(mouseX, mouseY)
+
+
         self.checkCardsHover(mouseX, mouseY)
         
         #compare the previous cursor state with the current cursor state
@@ -481,32 +493,36 @@ class GameManager(Screen):
 #                print(button.strLabel + " button clicked")
 #                button.action()
                 
-    def checkButtonsHover(self, x, y):
-        for button in self.buttons:
-            self.isCursorHovered = self.isCursorHovered or button.isHovered(x, y)
+#    def checkButtonsHover(self, x, y):
+#        for button in self.buttons:
+#            self.isCursorHovered = self.isCursorHovered or button.checkHovered(x, y)
 
     def checkCardsHover(self, x, y):
         for card in self.table.cards:
-            self.isCursorHovered = self.isCursorHovered or card.isHovered(x, y)
+            self.isCursorHovered = self.isCursorHovered or card.checkHovered(x, y)
 
         for card in self.cards:
-            self.isCursorHovered = self.isCursorHovered or card.isHovered(x, y)
+            self.isCursorHovered = self.isCursorHovered or card.checkHovered(x, y)
 
         if (self.draw_card != None):
-            self.isCursorHovered = self.isCursorHovered or self.draw_card.isHovered(x, y)
+            if (self.draw_card != self.players[self.iCurrentPlayer].selectedCard):
+                self.isCursorHovered = self.isCursorHovered or self.draw_card.checkHovered(x, y)
 
         
         for player in self.players:
             for card in player.cards:
-                self.isCursorHovered = self.isCursorHovered or card.isHovered(x, y)
+                if (card != player.selectedCard):
+                    self.isCursorHovered = self.isCursorHovered or card.checkHovered(x, y)
         
             for card in player.match_cards:
-                self.isCursorHovered = self.isCursorHovered or card.isHovered(x, y)
+                self.isCursorHovered = self.isCursorHovered or card.checkHovered(x, y)
 
         #check table hovered
         self.table.isSelected = False
         if (not self.isCursorHovered):
-            self.isCursorHovered = self.isCursorHovered or self.table.isHovered(x, y)
+#        isTableHovered = self.table.checkHovered(x, y)
+#            self.isCursorHovered = self.isCursorHovered or isTableHovered 
+            self.isCursorHovered = self.isCursorHovered or self.table.checkHovered(x, y)
     
     
     def continuePrompt(self):

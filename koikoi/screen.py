@@ -55,7 +55,7 @@ class Screen:
 
     def checkButtonsHover(self, x, y):
         for button in self.buttons:
-            self.isCursorHovered = self.isCursorHovered or button.isHovered(x, y)
+            self.isCursorHovered = self.isCursorHovered or button.checkHovered(x, y)
 
 
     def keyInputChar(self, inputChar):
