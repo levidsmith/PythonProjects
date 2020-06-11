@@ -479,7 +479,10 @@ class GameManager(Screen):
 
         for player in self.players:
             if (player == self.players[self.iCurrentPlayer]):
-                player.iRoundScores.append(player.score.iTotalPoints)
+                iPoints = player.score.iTotalPoints
+                if (self.players[(self.iCurrentPlayer + 1) % 2].score.isKoi):
+                    iPoints *= 2
+                player.iRoundScores.append(iPoints)
             else:
                 player.iRoundScores.append(0)
 

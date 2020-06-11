@@ -40,9 +40,6 @@ class Application:
 
 
 
-        if ("-nomusic" in sys.argv):
-            print("Disable Music")
-            gamemanager.set_audio_volume(0)
 
 
         
@@ -64,6 +61,11 @@ class Application:
 
         self.currentScreen = self.screens["title"]
 #        self.currentScreen = self.screens["gamecomplete"]
+
+
+        if ("-nomusic" in sys.argv):
+            print("Disable Music")
+            gamemanager.set_audio_volume(0)
 
 
         clock = pygame.time.Clock()

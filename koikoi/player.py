@@ -174,6 +174,7 @@ class Player:
     def checkContinueCPU(self):
         #We should have fancy AI here to figure out if they should continue
         iRand = randrange(1, 100)
+#        iRand = randrange(1, 49) #Always koi
         print("Random choice value is " + str(iRand))
         if (iRand < 50):
             self.gamemanager.doContinue()
