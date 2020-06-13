@@ -11,6 +11,7 @@ from screen_title import ScreenTitle
 from screen_gamecomplete import ScreenGameComplete
 from screen_options import ScreenOptions
 from options import Options
+from leaderboardmanager import LeaderboardManager
 from globals import Globals
 
 class Application:
@@ -39,7 +40,10 @@ class Application:
 #        font.append(pygame.font.Font("Aerovias Brasil NF.ttf", 32))
 
 
-
+        self.leaderboardmanager = LeaderboardManager()
+#        self.leaderboardmanager.getTopScores()
+#        self.leaderboardmanager.submitScore("hello", 42)
+#        self.leaderboardmanager.submitScore("world", 84)
 
 
         

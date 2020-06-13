@@ -80,7 +80,7 @@ class GameManager(Screen):
         self.card_back_images = []
         for i in range(12):
             for j in range(4):
-                print(str(i) + ", " + str(j))
+#                print(str(i) + ", " + str(j))
                 strFile = 'images/hanafuda_' + str(i + 1) + '-' + str(j + 1) + '.jpg'
                 if (os.path.isfile(strFile)):
                     img = pygame.image.load(strFile)
@@ -483,6 +483,9 @@ class GameManager(Screen):
                 if (self.players[(self.iCurrentPlayer + 1) % 2].score.isKoi):
                     iPoints *= 2
                 player.iRoundScores.append(iPoints)
+                if (player.isHuman):
+                    self.application.leaderboardmanager.submitScore(player.name, iPoints)
+
             else:
                 player.iRoundScores.append(0)
 
