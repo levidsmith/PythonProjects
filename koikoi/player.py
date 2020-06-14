@@ -21,7 +21,6 @@ class Player:
     
     
     def __init__(self, init_gamemanager):
-        name = "hello"
         self.cards = []
         self.match_cards = []
         self.score = Score()
@@ -36,6 +35,7 @@ class Player:
         self.iStep = Player.STEP_HAND_MATCH
         self.selectedCard = None
         self.selectedOffset = (0, 0)
+        self.name = "hello"
     
     def update(self):
         for card in self.cards:
@@ -64,6 +64,7 @@ class Player:
 
         if (self.isPlayerTurn):
             c = (255, 255, 0)
+
         DrawHelper.drawTextShadow(self.name, self.position[0] + 48, self.position[1] + 128, c, display, font['normal'])
         if (self.isPlayerTurn):
             DrawHelper.drawTextShadow(Player.STEP_NAMES[self.iStep], self.position[0], self.position[1] + 128 + 32, (0, 255, 255), display, font['small'])

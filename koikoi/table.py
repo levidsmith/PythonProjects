@@ -10,16 +10,27 @@ class Table:
         self.size = (512, (Card.h * 2 + 32))
         self.cards = []
         self.isSelected = False
+        self.surfaceBackground = None
+        self.makeBackground()
+
+    def makeBackground(self):
+        self.surfaceBackground = pygame.Surface(self.size)
+        self.surfaceBackground.set_alpha(64)
+        self.surfaceBackground.fill((0, 0, 255))
         
     
     def update(self):
         None
 
     def draw(self, display, font):
-        c = (0, 0, 128)
+#        c = (0, 0, 128)
+        self.surfaceBackground.set_alpha(32)
+
         if (self.isSelected):
-            c = (64, 64, 128)
-        pygame.draw.rect(display, c, (self.position[0], self.position[1], self.size[0], self.size[1]))
+            self.surfaceBackground.set_alpha(64)
+ #           c = (64, 64, 128)
+#        pygame.draw.rect(display, c, (self.position[0], self.position[1], self.size[0], self.size[1]))
+        display.blit(self.surfaceBackground, (self.position[0], self.position[1], self.size[0], self.size[1]))
 
 
 

@@ -255,12 +255,12 @@ class Score:
 
         #Build total score and score text
         self.iTotalPoints = 0
-        self.score_text = "Score\n"
+        self.score_text = "Yaku\n"
         for key in self.scoreDict:
             self.score_text += key + " " + str(self.scoreDict[key]) + "\n"
             self.iTotalPoints += self.scoreDict[key]
         
-        self.score_text += "Points " + str(self.iTotalPoints)
+        self.score_text += "Total " + str(self.iTotalPoints)
                 
             
             

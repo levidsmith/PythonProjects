@@ -11,18 +11,14 @@ from table import Table
 from button import Button
 from drawhelper import DrawHelper
 from globals import Globals
+from random import randrange
 
 from operator import itemgetter, attrgetter
 
-class GameManager(Screen):
+class GameManager():
 
     WAIT_DELAY = 60 * 2
 
-#    players = []
-#    draw_card = None
-    
-#    card_images = []
-#    card_back_images = []
     sound_effects = {}
     
     background = []
@@ -32,7 +28,6 @@ class GameManager(Screen):
     deck_position = (64, 296)
     draw_card_position = (256, 296)
     
-#    buttons = []
     
     def __init__(self, init_application):
         super().__init__()
@@ -44,34 +39,13 @@ class GameManager(Screen):
         self.table = Table()
         self.load_images()
         self.load_audio()
-        self.restart()
+#        self.restart()
 
-        self.makeButtons()
+#        self.makeButtons()
         self.isCursorHovered = False
         
         
 
-    
-    def makeButtons(self):
-        b = Button("Arrange", 0, 0)
-        b.action = self.arrangeCards
-        b.show()
-        self.buttons.append(b)
-
-        b = Button("Koi", 200, 0)
-        b.action = self.doContinue
-        b.hide()
-        self.buttons.append(b)
-        
-        b = Button("Stop", 400, 0)
-        b.action = self.doStop
-        b.hide()
-        self.buttons.append(b)
-
-        b = Button("Quit", 1100, 688)
-        b.action = self.doReturnToTitle
-        b.show()
-        self.buttons.append(b)
 
 
     
@@ -222,12 +196,16 @@ class GameManager(Screen):
 
         #Create players
         p1 = Player(self)
-        p1.name = "CPU"
+#        p1.name = "CPU"
         p1.isHidden = True
         p1.position = (64, 32)
-        p1.score_offset = (900, -20)
-        p1.card_types_offset = (1040, -20)
+        p1.score_offset = (1000, 200)
+        p1.card_types_offset = (1000, -20)
         p1.match_card_position = (660, 0)
+        if (p1.isHuman):
+            p1.name = self.application.options.strName
+        else:
+            p1.name = "CPU"
         self.players.append(p1)
     
 
@@ -235,12 +213,19 @@ class GameManager(Screen):
 
         p2 = Player(self)
 #        p2.name = "Player"
+
+        print("Name is " + self.application.options.strName)
         p2.name = self.application.options.strName
         p2.isHidden = False
         p2.isHuman = True
+        if (p2.isHuman):
+            p2.name = self.application.options.strName
+        else:
+            p2.name = "CPU"
+
         p2.position = (64, 512)
-        p2.score_offset = (900, -140)
-        p2.card_types_offset = (1040, -140)
+        p2.score_offset = (1000, 60)
+        p2.card_types_offset = (1000, -140)
         p2.match_card_position = (660, 0)
         
 
@@ -334,35 +319,6 @@ class GameManager(Screen):
           
 
                 
-    def draw(self, display, font):
-        display.blit(self.background[0], (0, 0))
-
-        self.table.draw(display, font)
-
-        for card in self.cards:
-            card.draw(display, font)
-
-        for card in self.table.cards:
-            card.draw(display, font)
-        
-        if (self.draw_card != None):
-            self.draw_card.draw(display, font)
-        
-        for player in self.players:
-            player.draw(display, font)
-            
-        for button in self.buttons:
-            button.draw(display, font)
-
-
-        strRound = "Round " + str(self.iRound + 1)
-        DrawHelper.drawTextShadow(strRound, 1280/2, 4, (255, 255, 255), display, font['normal'])
-
-        DrawHelper.drawTextShadow(str(len(self.cards)), 20, 360, (255, 255, 255), display, font['normal'])
-
-
-        strCopyright = '2020 Levi D. Smith'
-        DrawHelper.drawTextShadow(strCopyright, 500, 720-32, (255, 255, 255), display, font['normal'])
 
     def doNextPlayer(self):
         self.iCurrentPlayer += 1
@@ -396,49 +352,6 @@ class GameManager(Screen):
 
 
 
-    def mousePressed(self, mousePosition):
-        super().mousePressed(mousePosition)
-#        mouseX = mousePosition[0]
-#        mouseY = mousePosition[1]
-        currentPlayer = self.players[self.iCurrentPlayer]
-#        currentPlayer.mousePressed(mouseX, mouseY)
-        currentPlayer.mousePressed(mousePosition[0], mousePosition[1])
-
-#        self.checkButtonsPress(mouseX, mouseY)
-    
-    def mouseReleased(self, mousePosition):
-        mouseX = mousePosition[0]
-        mouseY = mousePosition[1]
-        currentPlayer = self.players[self.iCurrentPlayer]
-        currentPlayer.mouseReleased(mouseX, mouseY)
-
-        
-    def mouseMoved(self, mousePosition):
-        mouseX = mousePosition[0]
-        mouseY = mousePosition[1]
-
-        isHovered = self.isCursorHovered
-        self.isCursorHovered = False #Set cursor hovered to false, and then set it to true if any cards or buttons are hovered
-
-        super().mouseMoved(mousePosition)
-
-        currentPlayer = self.players[self.iCurrentPlayer]
-        currentPlayer.dragCard(mouseX, mouseY)
-        
-#        self.checkButtonsHover(mouseX, mouseY)
-
-
-        self.checkCardsHover(mouseX, mouseY)
-        
-        #compare the previous cursor state with the current cursor state
-        #only change the cursor if the state changes, to reduce flicker
-        if (isHovered != self.isCursorHovered):
-            if (self.isCursorHovered):
-                pygame.mouse.set_cursor(*pygame.cursors.diamond)
-            else:
-                pygame.mouse.set_cursor(*pygame.cursors.arrow)
-            
-            
     
         
             
@@ -463,8 +376,9 @@ class GameManager(Screen):
         
     def doContinue(self):
         print("Koi (Continue)")
-        self.buttons[1].hide()
-        self.buttons[2].hide()
+#        super().buttons[1].hide()
+#        super().buttons[2].hide()
+        self.application.screens["game"].hideContinueButtons()
 
         currentPlayer = self.players[self.iCurrentPlayer]
         currentPlayer.doContinue()
@@ -474,8 +388,13 @@ class GameManager(Screen):
         
     def doStop(self):
         print("Stop - End Round")
-        self.buttons[1].hide()
-        self.buttons[2].hide()
+        self.application.screens["game"].hideContinueButtons()
+#        super().buttons[1].hide()
+#        super().buttons[2].hide()
+
+# Use the lines below to stop the round, and make up a winning score for one of the players
+#        self.iCurrentPlayer = randrange(0, 2)
+#        self.players[self.iCurrentPlayer].score.iTotalPoints = randrange(10, 20)
 
         for player in self.players:
             if (player == self.players[self.iCurrentPlayer]):
@@ -489,52 +408,19 @@ class GameManager(Screen):
             else:
                 player.iRoundScores.append(0)
 
+            print("player " + player.name + ": " + str(player.iRoundScores))
+
 
         
         self.nextRound()
         
-#    def checkButtonsPress(self, x, y):
-#        for button in self.buttons:
-#            if (button.isClicked(x, y)):
-#                print(button.strLabel + " button clicked")
-#                button.action()
-                
-#    def checkButtonsHover(self, x, y):
-#        for button in self.buttons:
-#            self.isCursorHovered = self.isCursorHovered or button.checkHovered(x, y)
-
-    def checkCardsHover(self, x, y):
-        for card in self.table.cards:
-            self.isCursorHovered = self.isCursorHovered or card.checkHovered(x, y)
-
-        for card in self.cards:
-            self.isCursorHovered = self.isCursorHovered or card.checkHovered(x, y)
-
-        if (self.draw_card != None):
-            if (self.draw_card != self.players[self.iCurrentPlayer].selectedCard):
-                self.isCursorHovered = self.isCursorHovered or self.draw_card.checkHovered(x, y)
-
-        
-        for player in self.players:
-            for card in player.cards:
-                if (card != player.selectedCard):
-                    self.isCursorHovered = self.isCursorHovered or card.checkHovered(x, y)
-        
-            for card in player.match_cards:
-                self.isCursorHovered = self.isCursorHovered or card.checkHovered(x, y)
-
-        #check table hovered
-        self.table.isSelected = False
-        if (not self.isCursorHovered):
-#        isTableHovered = self.table.checkHovered(x, y)
-#            self.isCursorHovered = self.isCursorHovered or isTableHovered 
-            self.isCursorHovered = self.isCursorHovered or self.table.checkHovered(x, y)
     
     
     def continuePrompt(self):
         #show the "Koi" and "Stop" buttons
-        self.buttons[1].show()
-        self.buttons[2].show()
+        self.application.screens["game"].showContinueButtons()
+#        super().buttons[1].show()
+#        super().buttons[2].show()
         
     def doReturnToTitle(self):
         self.application.loadScreen("title")

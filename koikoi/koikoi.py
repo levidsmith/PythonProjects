@@ -10,6 +10,7 @@ from gamemanager import GameManager
 from screen_title import ScreenTitle
 from screen_gamecomplete import ScreenGameComplete
 from screen_options import ScreenOptions
+from screen_game import ScreenGame
 from options import Options
 from leaderboardmanager import LeaderboardManager
 from globals import Globals
@@ -57,8 +58,9 @@ class Application:
         screenOptions = ScreenOptions(self)
         self.screens["options"] = screenOptions
 
-        gamemanager = GameManager(self)
-        self.screens["gamemanager"] = gamemanager
+        self.gamemanager = GameManager(self)
+        screenGame = ScreenGame(self)
+        self.screens["game"] = screenGame
 
         screenGameComplete = ScreenGameComplete(self)
         self.screens["gamecomplete"] = screenGameComplete
@@ -69,7 +71,7 @@ class Application:
 
         if ("-nomusic" in sys.argv):
             print("Disable Music")
-            gamemanager.set_audio_volume(0)
+            self.gamemanager.set_audio_volume(0)
 
 
         clock = pygame.time.Clock()
@@ -89,6 +91,10 @@ class Application:
 
 #                    if (event.key == pygame.K_m):
 #                        gamemanager.set_audio_volume(0)
+#                    if (event.key == pygame.K_w):
+                        #self.gamemanager.restart()
+                        #self.gamemanager.nextRound()
+#                        self.gamemanager.doStop()
                     
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     self.currentScreen.mousePressed(pygame.mouse.get_pos())

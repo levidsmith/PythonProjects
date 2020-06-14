@@ -12,7 +12,6 @@ class ScreenOptions(Screen):
         super().__init__()
         print("init")
         self.application = init_application
-#        self.buttons = []
         self.buttonBegin = None
         self.makeButtons()
         self.imgBackground = None
@@ -23,7 +22,6 @@ class ScreenOptions(Screen):
 
 
     def makeButtons(self):
- #       self.buttons = []
         iOffset = ((Globals.SCREEN_SIZE[0] - (128 * 3)) / 2) + (128 * 0)
         b = Button("Begin", iOffset, 500)
         b.action = self.doBegin
@@ -152,7 +150,10 @@ class ScreenOptions(Screen):
 
     def doBegin(self):
         if (len(self.application.options.strName) >= 3):
-            self.application.loadScreen("gamemanager")
+            print("options name: " + self.application.options.strName)
+#            self.application.gamemanager.players[1].name = self.application.options.strName
+            self.application.gamemanager.restart()
+            self.application.loadScreen("game")
 
     def doBack(self):
         self.application.loadScreen("title")
