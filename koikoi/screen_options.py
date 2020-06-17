@@ -77,12 +77,10 @@ class ScreenOptions(Screen):
 
 
     def update(self):
-#        print("update")
         pass
 
 
     def draw(self, display, font):
-#        print("draw")
         iOffsetX = 64
         iOffsetValueX = 512
         iOffsetY = 200
@@ -117,41 +115,9 @@ class ScreenOptions(Screen):
         DrawHelper.drawTextShadow("Show Card Type", iOffsetX, iOffsetY + (iSpacing * 4), (255, 255, 255), display, font['normal'])
         DrawHelper.drawTextShadow(yesnoMap[self.application.options.showCardType], iOffsetValueX, iOffsetY + (iSpacing * 4), (255, 255, 0), display, font['normal'])
 
-
-#    def mousePressed(self, mousePosition):
-        
-#        for button in self.buttons:
-#            if (button.isClicked(mousePosition[0], mousePosition[1])):
-#                print(button.strLabel + " button clicked")
-#                if (button.action_params != None):
-#                    button.action(button.action_params)
-#                else:
-#                    button.action()
-
-#    def mouseMoved(self, mousePosition):
-#        mouseX = mousePosition[0]
-#        mouseY = mousePosition[1]
-        
-#        isHovered = self.isCursorHovered
-#        self.isCursorHovered = False #Set cursor hovered to false, and then set it to true if any cards or buttons are hovered
-
-#        self.checkButtonsHover(mouseX, mouseY)
-#        if (isHovered != self.isCursorHovered):
-#            if (self.isCursorHovered):
-#                pygame.mouse.set_cursor(*pygame.cursors.diamond)
-#            else:
-#                pygame.mouse.set_cursor(*pygame.cursors.arrow)
-
-
-#    def checkButtonsHover(self, x, y):
-#        for button in self.buttons:
-#            self.isCursorHovered = self.isCursorHovered or button.isHovered(x, y)
-
-
     def doBegin(self):
         if (len(self.application.options.strName) >= 3):
             print("options name: " + self.application.options.strName)
-#            self.application.gamemanager.players[1].name = self.application.options.strName
             self.application.gamemanager.restart()
             self.application.loadScreen("game")
 
@@ -171,10 +137,6 @@ class ScreenOptions(Screen):
             self.buttonBegin.isHidden = False
         else:
             self.buttonBegin.isHidden = True
-
-#    def doSetRounds(self, iRounds):
-#        print("Set rounds: " + str(iRounds))
-#        self.application.options.iTotalRounds = iRounds
 
 
     def doSetRounds(self, iRounds):

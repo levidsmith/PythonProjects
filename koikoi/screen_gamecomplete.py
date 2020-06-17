@@ -27,8 +27,6 @@ class ScreenGameComplete(Screen):
 
 
     def makeButtons(self):
-#        self.buttons = []
-
         iOffset = (Globals.SCREEN_SIZE[0] - 128) / 2
         b = Button("Finished", iOffset, 680)
         b.action = self.doFinished
@@ -38,11 +36,9 @@ class ScreenGameComplete(Screen):
 
 
     def update(self):
-#        print("update")
         pass
 
     def draw(self, display, font):
-#        print("draw")
         display.blit(self.imgBackground, (0, 0))
 
         display.blit(self.surfaceBackground.subsurface(0, 0, 600, ((2 + self.application.options.iTotalRounds) * ScreenGameComplete.ROW_SPACING)), (400, 100))

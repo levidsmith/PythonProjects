@@ -32,16 +32,12 @@ class GameManager():
     def __init__(self, init_application):
         super().__init__()
 
-#        self.iTotalRounds = 6
         self.application = init_application
         self.players = []
         self.cards = []
         self.table = Table()
         self.load_images()
         self.load_audio()
-#        self.restart()
-
-#        self.makeButtons()
         self.isCursorHovered = False
         
         
@@ -54,7 +50,6 @@ class GameManager():
         self.card_back_images = []
         for i in range(12):
             for j in range(4):
-#                print(str(i) + ", " + str(j))
                 strFile = 'images/hanafuda_' + str(i + 1) + '-' + str(j + 1) + '.jpg'
                 if (os.path.isfile(strFile)):
                     img = pygame.image.load(strFile)
@@ -196,7 +191,6 @@ class GameManager():
 
         #Create players
         p1 = Player(self)
-#        p1.name = "CPU"
         p1.isHidden = True
         p1.position = (64, 32)
         p1.score_offset = (1000, 200)
@@ -212,7 +206,6 @@ class GameManager():
 
 
         p2 = Player(self)
-#        p2.name = "Player"
 
         print("Name is " + self.application.options.strName)
         p2.name = self.application.options.strName
@@ -268,7 +261,6 @@ class GameManager():
     def nextRound(self):
         self.iRound += 1
 
-#        if (self.iRound >= self.iTotalRounds):
         if (self.iRound >= self.application.options.iTotalRounds):
             self.application.loadScreen("gamecomplete")
 
@@ -303,7 +295,6 @@ class GameManager():
 
 
     def update(self):
-#        print ("GameManager update")
         for card in self.table.cards:
             card.update()
             
@@ -376,8 +367,6 @@ class GameManager():
         
     def doContinue(self):
         print("Koi (Continue)")
-#        super().buttons[1].hide()
-#        super().buttons[2].hide()
         self.application.screens["game"].hideContinueButtons()
 
         currentPlayer = self.players[self.iCurrentPlayer]
@@ -389,8 +378,6 @@ class GameManager():
     def doStop(self):
         print("Stop - End Round")
         self.application.screens["game"].hideContinueButtons()
-#        super().buttons[1].hide()
-#        super().buttons[2].hide()
 
 # Use the lines below to stop the round, and make up a winning score for one of the players
 #        self.iCurrentPlayer = randrange(0, 2)
@@ -417,10 +404,7 @@ class GameManager():
     
     
     def continuePrompt(self):
-        #show the "Koi" and "Stop" buttons
         self.application.screens["game"].showContinueButtons()
-#        super().buttons[1].show()
-#        super().buttons[2].show()
         
     def doReturnToTitle(self):
         self.application.loadScreen("title")

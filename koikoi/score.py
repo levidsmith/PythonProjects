@@ -1,21 +1,6 @@
 #2020 Levi D. Smith - levidsmith.com
 class Score:
 
-#    hasSankou = False
-#    hasShikou = False
-#    hasAmeShikou = False
-#    hasGokou = False
-#    hasInoshikachou = False
-#    hasTane = False
-#    hasAkaTan = False
-#    hasAoTan = False
-#    hasAkaAoNoChoufuku = False
-#    hasTanzaku = False
-#    hasTsukimiZake = False
-#    hasHanamiZake = False
-#    hasKasu = False
-#    iKasuCount = 0
- 
     def __init__(self):
         self.scoreDict = { }
         self.score_text = "Scores"
@@ -92,9 +77,6 @@ class Score:
         if (iRibbons > 0): 
             self.card_type_totals_text += "Ribbons " + str(iRibbons) + "\n"
 
-#        if (iRedRibbons > 0): 
-#            self.card_type_totals_text += "Red Ribbons " + str(iRedRibbons) + "\n"
-
         if (iBlueRibbons > 0): 
             self.card_type_totals_text += "Blue Ribbons " + str(iBlueRibbons) + "\n"
 
@@ -119,8 +101,6 @@ class Score:
         if (not strKey in self.scoreDict):
             if (iNormals >= 10):
                 iPoints = 1 + (iNormals - 10)
-#            if (iNormals >= 1):
-#                iPoints = 99
                 self.scoreDict[strKey] = iPoints
                 self.hasNewScore = True
 

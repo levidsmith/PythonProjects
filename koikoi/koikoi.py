@@ -37,16 +37,9 @@ class Application:
         font['small'] = pygame.font.Font("fonts/Seven Swordsmen BB.ttf", 20)
         font['normal'] = pygame.font.Font("fonts/Seven Swordsmen BB.ttf", 32)
         font['title'] = pygame.font.Font("fonts/Seven Swordsmen BB.ttf", 128)
-#        font.append(pygame.font.Font("Aerovias Brasil NF.ttf", 20))
-#        font.append(pygame.font.Font("Aerovias Brasil NF.ttf", 32))
 
 
         self.leaderboardmanager = LeaderboardManager()
-#        self.leaderboardmanager.getTopScores()
-#        self.leaderboardmanager.submitScore("hello", 42)
-#        self.leaderboardmanager.submitScore("world", 84)
-
-
         
         #make array of screens
         self.screens = {}
@@ -66,8 +59,6 @@ class Application:
         self.screens["gamecomplete"] = screenGameComplete
 
         self.currentScreen = self.screens["title"]
-#        self.currentScreen = self.screens["gamecomplete"]
-
 
         if ("-nomusic" in sys.argv):
             print("Disable Music")
@@ -89,13 +80,6 @@ class Application:
                     if (event.key == pygame.K_DELETE or event.key == pygame.K_BACKSPACE):
                         self.currentScreen.keyInputDelete()
 
-#                    if (event.key == pygame.K_m):
-#                        gamemanager.set_audio_volume(0)
-#                    if (event.key == pygame.K_w):
-                        #self.gamemanager.restart()
-                        #self.gamemanager.nextRound()
-#                        self.gamemanager.doStop()
-                    
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     self.currentScreen.mousePressed(pygame.mouse.get_pos())
                 elif event.type == pygame.MOUSEBUTTONUP:

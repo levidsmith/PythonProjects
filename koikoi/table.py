@@ -23,13 +23,10 @@ class Table:
         None
 
     def draw(self, display, font):
-#        c = (0, 0, 128)
         self.surfaceBackground.set_alpha(32)
 
         if (self.isSelected):
             self.surfaceBackground.set_alpha(64)
- #           c = (64, 64, 128)
-#        pygame.draw.rect(display, c, (self.position[0], self.position[1], self.size[0], self.size[1]))
         display.blit(self.surfaceBackground, (self.position[0], self.position[1], self.size[0], self.size[1]))
 
 

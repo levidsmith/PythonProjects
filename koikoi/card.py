@@ -32,8 +32,6 @@ class Card:
     y = 0
     w = 64
     h = 128
-#    w = 32
-#    h = 64
     targetPosition = (0, 0)
     previousPosition = (0, 0)
 	
@@ -57,8 +55,6 @@ class Card:
 
             if (self.isHovered):
                 c = (128, 0, 0)
-#                pygame.draw.rect(display, c, (self.x, self.y, self.w, self.h))
-#                display.blit(self.application.gamemanager.surface_card_highlight, (0, ))
                 display.blit(self.surface_highlight, (self.x, self.y))
 
 
@@ -147,7 +143,6 @@ class Card:
         
     def checkHovered(self, x, y):
         if (x > self.x and x < self.x + self.w and y > self.y and y < self.y + self.h):
-#            pygame.mouse.set_cursor(*pygame.cursors.diamond)
             self.isHovered = True
             return True
         else:

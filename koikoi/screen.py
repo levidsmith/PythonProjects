@@ -18,9 +18,6 @@ class Screen:
         pass
 
 
-#    def mousePressed(self, mousePosition):
-#        pass
-
     def mousePressed(self, mousePosition):
         
         for button in self.buttons:
@@ -35,8 +32,6 @@ class Screen:
     def mouseReleased(self, mousePosition):
         pass
 
-#    def mouseMoved(self, mousePosition):
-#        pass
 
     def mouseMoved(self, mousePosition):
         mouseX = mousePosition[0]
