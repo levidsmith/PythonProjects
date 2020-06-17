@@ -39,11 +39,6 @@ class GameManager():
         self.load_images()
         self.load_audio()
         self.isCursorHovered = False
-        
-        
-
-
-
     
     def load_images(self):
         self.card_images = []
@@ -67,6 +62,14 @@ class GameManager():
         self.surface_card_highlight = pygame.Surface((64, 128))
         self.surface_card_highlight.set_alpha(128)
         self.surface_card_highlight.fill((255, 0, 0))
+
+        self.surface_card_hint = pygame.Surface((64, 128))
+        self.surface_card_hint.set_alpha(128)
+        self.surface_card_hint.fill((255, 255, 0))
+
+        self.surface_card_selected = pygame.Surface((64, 128))
+        self.surface_card_selected.set_alpha(128)
+        self.surface_card_selected.fill((0, 255, 0))
 
 
         imgBackground = pygame.image.load('images/background_game.jpg')
@@ -97,6 +100,8 @@ class GameManager():
                 card.img_back = self.card_back_images[0]
                 card.img_border = self.card_back_images[1]
                 card.surface_highlight = self.surface_card_highlight
+                card.surface_hint = self.surface_card_hint
+                card.surface_selected = self.surface_card_selected
 
                 if (i == 0):
                     if (j == 2):
@@ -184,10 +189,6 @@ class GameManager():
                 self.cards.append(card)
         
         random.shuffle(self.cards)
-        
-
-
-        
 
         #Create players
         p1 = Player(self)
@@ -201,12 +202,9 @@ class GameManager():
         else:
             p1.name = "CPU"
         self.players.append(p1)
-    
-
 
 
         p2 = Player(self)
-
         print("Name is " + self.application.options.strName)
         p2.name = self.application.options.strName
         p2.isHidden = False
@@ -264,8 +262,6 @@ class GameManager():
         if (self.iRound >= self.application.options.iTotalRounds):
             self.application.loadScreen("gamecomplete")
 
-            
-
         for player in self.players:
             while (len(player.cards) > 0):
                 card = player.cards.pop()
@@ -283,7 +279,6 @@ class GameManager():
         while (len(self.table.cards) > 0):
             card = self.table.cards.pop()
             self.cards.append(card)
-
             
         for card in self.cards:
             card.isHidden = True
@@ -292,7 +287,6 @@ class GameManager():
         
         self.setCardPositions()
         self.dealCards()
-
 
     def update(self):
         for card in self.table.cards:
@@ -307,9 +301,6 @@ class GameManager():
 
         if (not self.players[self.iCurrentPlayer].isPlayerTurn):
             self.doNextPlayer()
-          
-
-                
 
     def doNextPlayer(self):
         self.iCurrentPlayer += 1
@@ -319,6 +310,8 @@ class GameManager():
         self.players[self.iCurrentPlayer].isPlayerTurn = True
         self.players[self.iCurrentPlayer].iStep = Player.STEP_HAND_MATCH
         self.players[self.iCurrentPlayer].iWaitDelay = self.WAIT_DELAY
+
+        self.checkHints()
         
 
         print("doNextPlayer " + str(self.iCurrentPlayer))
@@ -340,11 +333,6 @@ class GameManager():
             card.targetPosition = (card.x, card.y)
             i += 1
 
-
-
-
-    
-        
             
     def isCardAtPosition(self, card, x, y):
         isCardAtPosition = False
@@ -384,10 +372,14 @@ class GameManager():
 #        self.players[self.iCurrentPlayer].score.iTotalPoints = randrange(10, 20)
 
         for player in self.players:
-            if (player == self.players[self.iCurrentPlayer]):
+            if (player == self.getCurrentPlayer()):
                 iPoints = player.score.iTotalPoints
-                if (self.players[(self.iCurrentPlayer + 1) % 2].score.isKoi):
+#                if (self.players[(self.iCurrentPlayer + 1) % 2].score.isKoi):
+                if (self.getIdlePlayer().score.isKoi):
                     iPoints *= 2
+                if (player.score.iTotalPoints >= 7):
+                    iPoints *= 2
+
                 player.iRoundScores.append(iPoints)
                 if (player.isHuman):
                     self.application.leaderboardmanager.submitScore(player.name, iPoints)
@@ -397,14 +389,71 @@ class GameManager():
 
             print("player " + player.name + ": " + str(player.iRoundScores))
 
-
-        
         self.nextRound()
-        
-    
     
     def continuePrompt(self):
         self.application.screens["game"].showContinueButtons()
         
     def doReturnToTitle(self):
         self.application.loadScreen("title")
+
+    def checkHints(self):
+        self.resetHints()
+        print("gamemanager.checkHints()")
+
+        if (self.getCurrentPlayer().iStep == Player.STEP_HAND_MATCH):
+
+            if (self.getCurrentPlayer().selectedCard == None):
+                print("selectedCard is None")
+                for card_hand in self.getCurrentPlayer().cards:
+                    #card_hand.isHint = False
+                    for card_table in self.table.cards:
+                        if (card_hand.iMonth == card_table.iMonth):
+                            print("Found match card")
+                            card_hand.isHint = True
+            else:
+                cardMatches = self.getCurrentPlayer().getPossibleMatches(self.getCurrentPlayer().selectedCard)
+                for card in cardMatches:
+                    card.isHint = True
+
+        elif (self.getCurrentPlayer().iStep == Player.STEP_DRAW):
+            for card in self.cards:
+                if (card == self.cards[len(self.cards) - 1]):
+                    card.isHint = True
+
+        elif (self.getCurrentPlayer().iStep == Player.STEP_DRAW_MATCH):
+            if (self.getCurrentPlayer().selectedCard == None and self.draw_card != None):
+                self.draw_card.isHint = True
+            else:
+                cardMatches = self.getCurrentPlayer().getPossibleMatches(self.draw_card)
+                for card in cardMatches:
+                    card.isHint = True
+
+    def resetHints(self):
+        print("resetHints()")
+        for player in self.players:
+            for card in player.cards:
+                card.isHint = False
+
+            for card in player.match_cards:
+                card.isHint = False
+
+            if (player.selectedCard != None):
+                player.selectedCard.isHint = False
+
+            for card in self.table.cards:
+                card.isHint = False
+        
+        for card in self.table.cards:
+            card.isHint = False
+
+        for card in self.cards:
+            card.isHint = False
+
+        
+
+    def getCurrentPlayer(self):
+        return self.players[self.iCurrentPlayer]
+
+    def getIdlePlayer(self):
+        return self.players[(self.iCurrentPlayer + 1) % 2]        

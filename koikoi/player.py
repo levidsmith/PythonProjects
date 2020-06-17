@@ -52,7 +52,13 @@ class Player:
     
     def draw(self, display, font):
         for card in self.cards:
+#            if (card == self.selectedCard):
+#                card.drawSelected(display, font)
+#            else:
+#                card.draw(display, font)
             card.draw(display, font)
+
+
 
         for card in self.match_cards:
             card.draw(display, font)
@@ -234,6 +240,7 @@ class Player:
 
             self.gamemanager.draw_card = draw_card
             self.iStep = Player.STEP_DRAW_MATCH
+            self.gamemanager.checkHints()
         else:
             print("No more cards")
       
@@ -243,14 +250,6 @@ class Player:
         self.gamemanager.setCardPositions()
         if (card in self.cards):
             self.cards.remove(card)
-
-
-        
-        
-        
-        
-
-
         
     def setCardPositions(self):
         i = 0
@@ -271,8 +270,6 @@ class Player:
         
     def continuePrompt(self):
         self.gamemanager.continuePrompt()
-        
-
         
     def doContinue(self):
         self.score.isKoi = True
@@ -339,20 +336,24 @@ class Player:
                             self.continuePrompt()
                         else:
                             self.iStep = Player.STEP_DRAW
+                            self.gamemanager.checkHints()
                         self.selectedCard = None
                     else:
                         self.selectedCard.targetPosition = self.selectedCard.previousPosition
                         self.selectedCard = None
+                        self.gamemanager.checkHints()
+                elif (self.gamemanager.table.isSelected):
+                    self.doDiscard(self.selectedCard)
+                    self.selectedCard = None
+                    self.gamemanager.setCardPositions()
+                    self.iStep = Player.STEP_DRAW
+                    self.gamemanager.checkHints()
                 else:
-                    if (self.gamemanager.table.isSelected):
-                        self.doDiscard(self.selectedCard)
-                        self.selectedCard = None
-                        self.gamemanager.setCardPositions()
-                        self.iStep = Player.STEP_DRAW
-                    else:
-                        self.selectedCard.targetPosition = self.selectedCard.previousPosition
-                        self.selectedCard = None
-
+                    print("no card landed")
+                    self.selectedCard.targetPosition = self.selectedCard.previousPosition
+                    self.selectedCard = None
+#                    self.gamemanager.resetHints()
+                    self.gamemanager.checkHints()
 
             elif (self.iStep == Player.STEP_DRAW_MATCH):
                 if (landedCard != None):
@@ -368,6 +369,7 @@ class Player:
                     else:
                         self.selectedCard.targetPosition = self.selectedCard.previousPosition
                         self.selectedCard = None
+                        self.gamemanager.checkHints()
                 
                 else:
                     if (self.gamemanager.table.isSelected):
@@ -377,6 +379,10 @@ class Player:
                     else:
                         self.selectedCard.targetPosition = self.selectedCard.previousPosition
                         self.selectedCard = None
+                        self.gamemanager.checkHints()
+
+#            self.gamemanager.resetHints()
+
                 
         
     def dragCard(self, x, y):
@@ -386,7 +392,13 @@ class Player:
             self.selectedCard.targetPosition = (x - self.selectedOffset[0], y - self.selectedOffset[1])
 
     def selectCard(self, card, xPress, yPress):
-        print("Selected card " + str(card))
+#        print("Selected card " + str(card))
         self.selectedOffset = (xPress - card.x, yPress - card.y)
+#        self.gamemanager.resetHints()
         self.selectedCard = card
         self.selectedCard.previousPosition = (self.selectedCard.x, self.selectedCard.y)
+        self.gamemanager.checkHints()
+#        cardMatches = self.getPossibleMatches(card)
+#        for card in cardMatches:
+#            card.isHint = True
+
