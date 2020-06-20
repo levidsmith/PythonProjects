@@ -206,11 +206,13 @@ class Player:
             if (len(possible_matches) == 3):  #handle the special case of three matching cards
                 for card in possible_matches:
                     self.match_cards.append(card)
-                    self.gamemanager.table.cards.remove(card)
+                    #self.gamemanager.table.cards.remove(card)
+                    self.gamemanager.table.removeCard(card)
 
             else:
                 self.match_cards.append(match_card2)
-                self.gamemanager.table.cards.remove(match_card2)
+#                self.gamemanager.table.cards.remove(match_card2)
+                self.gamemanager.table.removeCard(match_card2)
 
 
             self.score.checkScore(self.match_cards)
@@ -246,7 +248,8 @@ class Player:
       
     def doDiscard(self, card):
         card.isHidden = False
-        self.gamemanager.table.cards.append(card)
+#        self.gamemanager.table.cards.append(card)
+        self.gamemanager.table.addCard(card)
         self.gamemanager.setCardPositions()
         if (card in self.cards):
             self.cards.remove(card)

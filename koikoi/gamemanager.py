@@ -39,6 +39,11 @@ class GameManager():
         self.load_images()
         self.load_audio()
         self.isCursorHovered = False
+
+        #Highlight value used by all cards
+        self.fHighlightValue = 0
+        self.fHighlightIncrement = 0.03
+
     
     def load_images(self):
         self.card_images = []
@@ -88,7 +93,7 @@ class GameManager():
         self.iCurrentPlayer = 0
         self.players.clear()
         self.cards.clear()
-        self.table.cards.clear()
+        self.table.restart()
         self.draw_card = None
         self.iRound = 0
     
@@ -227,7 +232,8 @@ class GameManager():
         self.players[self.iCurrentPlayer].isPlayerTurn = True
         self.players[self.iCurrentPlayer].iWaitDelay = self.WAIT_DELAY
         
-        pygame.mixer.music.play(-1)
+        if (self.application.options.musicEnabled):
+            pygame.mixer.music.play(-1)
 
     def dealCards(self):
         #Deal to the table
@@ -236,9 +242,11 @@ class GameManager():
             draw_card.x = 0
             draw_card.y = (Globals.SCREEN_SIZE[1] - Card.h) / 2
             draw_card.isHidden = False
-            self.table.cards.append(draw_card)
+#            self.table.cards.append(draw_card)
+            self.table.addCard(draw_card)
 
         self.setCardPositions()
+#        self.table.setCardPositions()
 
         for player in self.players:
 
@@ -260,7 +268,13 @@ class GameManager():
         self.iRound += 1
 
         if (self.iRound >= self.application.options.iTotalRounds):
+            if (self.application.options.musicEnabled):
+                pygame.mixer.music.stop()
+
             self.application.loadScreen("gamecomplete")
+
+
+        self.table.restart()
 
         for player in self.players:
             while (len(player.cards) > 0):
@@ -289,6 +303,10 @@ class GameManager():
         self.dealCards()
 
     def update(self):
+        for card in self.cards:
+            card.update()
+
+
         for card in self.table.cards:
             card.update()
             
@@ -301,6 +319,16 @@ class GameManager():
 
         if (not self.players[self.iCurrentPlayer].isPlayerTurn):
             self.doNextPlayer()
+
+
+        self.fHighlightValue += self.fHighlightIncrement
+        if (self.fHighlightValue > 1.0):
+            self.fHighlightValue = 1.0
+            self.fHighlightIncrement = -abs(self.fHighlightIncrement)
+        elif (self.fHighlightValue < 0.0):
+            self.fHighlightValue = 0.0
+            self.fHighlightIncrement = abs(self.fHighlightIncrement)
+
 
     def doNextPlayer(self):
         self.iCurrentPlayer += 1
@@ -321,11 +349,6 @@ class GameManager():
 
     def setCardPositions(self):
         i = 0
-        iCardsPerRow = math.ceil(len(self.table.cards) / 2)
-        
-        for card in self.table.cards:
-            card.targetPosition = (self.table.position[0] + ((i % iCardsPerRow) * 80), self.table.position[1] + 160 * math.floor(i / iCardsPerRow))
-            i += 1
             
         for card in self.cards:
             card.x = self.deck_position[0] + (i * 2)
@@ -345,6 +368,8 @@ class GameManager():
     def arrangeCards(self):
         print("arrangeCards")
         self.table.cards.sort(key=attrgetter('iMonth'))
+        self.table.setCardPositions()
+
         self.setCardPositions()
         
         for player in self.players:
@@ -395,9 +420,15 @@ class GameManager():
         self.application.screens["game"].showContinueButtons()
         
     def doReturnToTitle(self):
+        if (self.application.options.musicEnabled):
+            pygame.mixer.music.stop()
+
         self.application.loadScreen("title")
 
     def checkHints(self):
+        if (not self.application.options.showHints):
+            return
+
         self.resetHints()
         print("gamemanager.checkHints()")
 

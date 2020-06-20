@@ -24,6 +24,7 @@ class Card:
     img_border = None
     surface_highlight = None
     surface_hint = None
+
     
     isHidden = True
   
@@ -106,10 +107,12 @@ class Card:
 
             if (self.isHovered):
                 c = (128, 0, 0)
+                self.surface_highlight.set_alpha(128 * self.application.gamemanager.fHighlightValue)
                 display.blit(self.surface_highlight, (self.x, self.y))
             
             elif (self.isHint):
                 c = (255, 255, 0)
+                self.surface_hint.set_alpha(128 * self.application.gamemanager.fHighlightValue)
                 display.blit(self.surface_hint, (self.x, self.y))
 
 
@@ -140,6 +143,7 @@ class Card:
             self.y -= iSpeed
             if (self.y < self.targetPosition[1]):
                 self.y = self.targetPosition[1]
+
             
             
 

@@ -50,28 +50,43 @@ class ScreenOptions(Screen):
             b.show()
             self.buttons.append(b)
 
-        yesnoOptions = [True, False]
-        yesnoMap = {}
-        yesnoMap[True] = "Yes"
-        yesnoMap[False] = "No"
-        for idx, hintEnabled in enumerate(yesnoOptions):
-            b = Button(yesnoMap[hintEnabled], iOffsetValueX + 256 + (idx * (128 + 8)), iOffsetY + (iSpacing * 2))
+        self.yesnoOptions = [True, False]
+        self.yesnoMap = {}
+        self.yesnoMap[True] = "Yes"
+        self.yesnoMap[False] = "No"
+
+        self.onoffOptions = [True, False]
+        self.onoffMap = {}
+        self.onoffMap[True] = "On"
+        self.onoffMap[False] = "Off"
+
+
+
+        for idx, hintEnabled in enumerate(self.yesnoOptions):
+            b = Button(self.yesnoMap[hintEnabled], iOffsetValueX + 256 + (idx * (128 + 8)), iOffsetY + (iSpacing * 2))
             b.action = self.doSetHint
             b.action_params = hintEnabled
             b.show()
             self.buttons.append(b)
 
-        for idx, showMonthEnabled in enumerate(yesnoOptions):
-            b = Button(yesnoMap[showMonthEnabled], iOffsetValueX + 256 + (idx * (128 + 8)), iOffsetY + (iSpacing * 3))
+        for idx, showMonthEnabled in enumerate(self.yesnoOptions):
+            b = Button(self.yesnoMap[showMonthEnabled], iOffsetValueX + 256 + (idx * (128 + 8)), iOffsetY + (iSpacing * 3))
             b.action = self.doSetShowMonth
             b.action_params = showMonthEnabled
             b.show()
             self.buttons.append(b)
 
-        for idx, showCardTypeEnabled in enumerate(yesnoOptions):
-            b = Button(yesnoMap[showCardTypeEnabled], iOffsetValueX + 256 + (idx * (128 + 8)), iOffsetY + (iSpacing * 4))
+        for idx, showCardTypeEnabled in enumerate(self.yesnoOptions):
+            b = Button(self.yesnoMap[showCardTypeEnabled], iOffsetValueX + 256 + (idx * (128 + 8)), iOffsetY + (iSpacing * 4))
             b.action = self.doSetShowCardType
             b.action_params = showCardTypeEnabled
+            b.show()
+            self.buttons.append(b)
+
+        for idx, musicEnabled in enumerate(self.onoffOptions):
+            b = Button(self.onoffMap[musicEnabled], iOffsetValueX + 256 + (idx * (128 + 8)), iOffsetY + (iSpacing * 5))
+            b.action = self.doSetMusicEnabled
+            b.action_params = musicEnabled
             b.show()
             self.buttons.append(b)
 
@@ -99,21 +114,31 @@ class ScreenOptions(Screen):
         DrawHelper.drawTextShadow(str(self.application.options.iTotalRounds), iOffsetValueX, iOffsetY + (iSpacing * 1), (255, 255, 0), display, font['normal'])
 
 
-        yesnoOptions = [True, False]
-        yesnoMap = {}
-        yesnoMap[True] = "Yes"
-        yesnoMap[False] = "No"
+#        yesnoOptions = [True, False]
+#        yesnoMap = {}
+#        yesnoMap[True] = "Yes"
+#        yesnoMap[False] = "No"
+
+
+ #       onoffOptions = [True, False]
+#        onoffMap = {}
+#        onoffMap[True] = "On"
+#        onoffMap[False] = "Off"
 
 
         DrawHelper.drawTextShadow("Show Hints", iOffsetX, iOffsetY + (iSpacing * 2), (255, 255, 255), display, font['normal'])
         strValue = ""
-        DrawHelper.drawTextShadow(yesnoMap[self.application.options.showHints], iOffsetValueX, iOffsetY + (iSpacing * 2), (255, 255, 0), display, font['normal'])
+        DrawHelper.drawTextShadow(self.yesnoMap[self.application.options.showHints], iOffsetValueX, iOffsetY + (iSpacing * 2), (255, 255, 0), display, font['normal'])
 
         DrawHelper.drawTextShadow("Show Month Number", iOffsetX, iOffsetY + (iSpacing * 3), (255, 255, 255), display, font['normal'])
-        DrawHelper.drawTextShadow(yesnoMap[self.application.options.showMonth], iOffsetValueX, iOffsetY + (iSpacing * 3), (255, 255, 0), display, font['normal'])
+        DrawHelper.drawTextShadow(self.yesnoMap[self.application.options.showMonth], iOffsetValueX, iOffsetY + (iSpacing * 3), (255, 255, 0), display, font['normal'])
 
         DrawHelper.drawTextShadow("Show Card Type", iOffsetX, iOffsetY + (iSpacing * 4), (255, 255, 255), display, font['normal'])
-        DrawHelper.drawTextShadow(yesnoMap[self.application.options.showCardType], iOffsetValueX, iOffsetY + (iSpacing * 4), (255, 255, 0), display, font['normal'])
+        DrawHelper.drawTextShadow(self.yesnoMap[self.application.options.showCardType], iOffsetValueX, iOffsetY + (iSpacing * 4), (255, 255, 0), display, font['normal'])
+
+        DrawHelper.drawTextShadow("Music", iOffsetX, iOffsetY + (iSpacing * 5), (255, 255, 255), display, font['normal'])
+        DrawHelper.drawTextShadow(self.onoffMap[self.application.options.musicEnabled], iOffsetValueX, iOffsetY + (iSpacing * 5), (255, 255, 0), display, font['normal'])
+
 
     def doBegin(self):
         if (len(self.application.options.strName) >= 3):
@@ -154,3 +179,7 @@ class ScreenOptions(Screen):
     def doSetShowCardType(self, showCardTypeEnabled):
         print("show card type " + str(showCardTypeEnabled))
         self.application.options.showCardType = showCardTypeEnabled
+
+    def doSetMusicEnabled(self, musicEnabled):
+        print("music enabled " + str(musicEnabled))
+        self.application.options.musicEnabled = musicEnabled

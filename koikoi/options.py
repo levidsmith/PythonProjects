@@ -10,3 +10,4 @@ class Options:
         self.showHints = True
         self.showMonth = True
         self.showCardType = True
+        self.musicEnabled = True
