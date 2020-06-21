@@ -103,8 +103,9 @@ class ScreenOptions(Screen):
 
         display.blit(self.imgBackground, (0, 0))
 
-        for button in self.buttons:
-            button.draw(display, font)
+#        for button in self.buttons:
+#            button.draw(display, font)
+        super().draw(display, font)
 
 
         DrawHelper.drawTextShadow("Name", iOffsetX, iOffsetY + (iSpacing * 0), (255, 255, 255), display, font['normal'])
@@ -143,8 +144,10 @@ class ScreenOptions(Screen):
     def doBegin(self):
         if (len(self.application.options.strName) >= 3):
             print("options name: " + self.application.options.strName)
-            self.application.gamemanager.restart()
-            self.application.loadScreen("game")
+           # self.application.gamemanager.restart()
+            #self.application.loadScreen("game")
+            self.application.choosedealer.restart()
+            self.application.loadScreen("choosedealer")            
 
     def doBack(self):
         self.application.loadScreen("title")

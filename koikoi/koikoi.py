@@ -13,6 +13,8 @@ from screen_options import ScreenOptions
 from screen_game import ScreenGame
 from options import Options
 from leaderboardmanager import LeaderboardManager
+from choosedealer import ChooseDealer
+from screen_choosedealer import ScreenChooseDealer
 from globals import Globals
 
 class Application:
@@ -50,6 +52,10 @@ class Application:
         self.options = Options()
         screenOptions = ScreenOptions(self)
         self.screens["options"] = screenOptions
+
+        self.choosedealer = ChooseDealer(self)
+        screenChooseDealer = ScreenChooseDealer(self)
+        self.screens["choosedealer"] = screenChooseDealer
 
         self.gamemanager = GameManager(self)
         screenGame = ScreenGame(self)

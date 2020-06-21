@@ -11,8 +11,8 @@ class Screen:
         pass
     
     def draw(self, display, font):
-        pass
-
+        for button in self.buttons:
+            button.draw(display, font)
     
     def restart(self):
         pass

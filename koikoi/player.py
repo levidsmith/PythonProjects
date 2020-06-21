@@ -122,6 +122,13 @@ class Player:
         if (self.iStep == Player.STEP_HAND_MATCH and len(self.cards) == 0):
             self.iStep = Player.STEP_DRAW
 
+        if (self.iStep == Player.STEP_DRAW and len(self.gamemanager.cards) == 0):
+            #self.iStep = Player.STEP_DRAW
+            self.iStep = Player.STEP_DONE
+            self.gamemanager.doStopDraw()
+            
+
+
         if (self.iStep == Player.STEP_DONE):
             self.setCardPositions()
             self.gamemanager.setCardPositions()

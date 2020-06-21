@@ -23,12 +23,12 @@ class GameManager():
     
     background = []
 
-    iCurrentPlayer = 0
+#    iCurrentPlayer = 0
     
     deck_position = (64, 296)
     draw_card_position = (256, 296)
-    
-    
+
+        
     def __init__(self, init_application):
         super().__init__()
 
@@ -36,9 +36,13 @@ class GameManager():
         self.players = []
         self.cards = []
         self.table = Table()
+        self.draw_card = None
         self.load_images()
         self.load_audio()
         self.isCursorHovered = False
+
+        self.iRound = 0
+        self.iCurrentPlayer = -1
 
         #Highlight value used by all cards
         self.fHighlightValue = 0
@@ -90,13 +94,66 @@ class GameManager():
         pygame.mixer.music.set_volume(0)
     
     def restart(self):
-        self.iCurrentPlayer = 0
+#        self.iCurrentPlayer = 0
         self.players.clear()
-        self.cards.clear()
         self.table.restart()
         self.draw_card = None
         self.iRound = 0
+
+        self.createDeck()
     
+
+        #Create players
+        p1 = Player(self)
+        p1.isHidden = True
+        p1.position = (64, 32)
+        p1.score_offset = (1000, 200)
+        p1.card_types_offset = (1000, -20)
+        p1.match_card_position = (660, 0)
+        if (p1.isHuman):
+            p1.name = self.application.options.strName
+        else:
+            p1.name = "CPU"
+        self.players.append(p1)
+
+
+        p2 = Player(self)
+        print("Name is " + self.application.options.strName)
+        p2.name = self.application.options.strName
+        p2.isHidden = False
+        p2.isHuman = True
+        if (p2.isHuman):
+            p2.name = self.application.options.strName
+        else:
+            p2.name = "CPU"
+
+        p2.position = (64, 512)
+        p2.score_offset = (1000, 60)
+        p2.card_types_offset = (1000, -140)
+        p2.match_card_position = (660, 0)
+        
+
+        self.players.append(p2)
+        
+        self.dealCards()
+        
+#        self.players[self.iCurrentPlayer].isPlayerTurn = True
+#        self.players[self.iCurrentPlayer].iWaitDelay = self.WAIT_DELAY
+        self.getCurrentPlayer().isPlayerTurn = True
+        if (not self.getCurrentPlayer().isHuman):
+            self.getCurrentPlayer().iWaitDelay = self.WAIT_DELAY
+
+        self.checkHints()
+#        self.players[self.iCurrentPlayer].iWaitDelay = self.WAIT_DELAY
+
+
+        if (self.application.options.musicEnabled):
+            pygame.mixer.music.play(-1)
+
+
+    def createDeck(self):
+        self.cards.clear()
+
         for i in range(12):
             for j in range(4):
                 card = Card((i * 4) + j,  i * 80, j * 150, self.application)
@@ -195,45 +252,6 @@ class GameManager():
         
         random.shuffle(self.cards)
 
-        #Create players
-        p1 = Player(self)
-        p1.isHidden = True
-        p1.position = (64, 32)
-        p1.score_offset = (1000, 200)
-        p1.card_types_offset = (1000, -20)
-        p1.match_card_position = (660, 0)
-        if (p1.isHuman):
-            p1.name = self.application.options.strName
-        else:
-            p1.name = "CPU"
-        self.players.append(p1)
-
-
-        p2 = Player(self)
-        print("Name is " + self.application.options.strName)
-        p2.name = self.application.options.strName
-        p2.isHidden = False
-        p2.isHuman = True
-        if (p2.isHuman):
-            p2.name = self.application.options.strName
-        else:
-            p2.name = "CPU"
-
-        p2.position = (64, 512)
-        p2.score_offset = (1000, 60)
-        p2.card_types_offset = (1000, -140)
-        p2.match_card_position = (660, 0)
-        
-
-        self.players.append(p2)
-        
-        self.dealCards()
-        
-        self.players[self.iCurrentPlayer].isPlayerTurn = True
-        self.players[self.iCurrentPlayer].iWaitDelay = self.WAIT_DELAY
-        
-        if (self.application.options.musicEnabled):
-            pygame.mixer.music.play(-1)
 
     def dealCards(self):
         #Deal to the table
@@ -274,7 +292,6 @@ class GameManager():
             self.application.loadScreen("gamecomplete")
 
 
-        self.table.restart()
 
         for player in self.players:
             while (len(player.cards) > 0):
@@ -293,7 +310,10 @@ class GameManager():
         while (len(self.table.cards) > 0):
             card = self.table.cards.pop()
             self.cards.append(card)
-            
+
+        self.table.restart()
+
+
         for card in self.cards:
             card.isHidden = True
 
@@ -316,10 +336,15 @@ class GameManager():
         for player in self.players:
             player.update()
 
-
-        if (not self.players[self.iCurrentPlayer].isPlayerTurn):
+#        print ("iCurrentPlayer: " + str(self.iCurrentPlayer))
+        if ( (self.iCurrentPlayer >= 0) and (self.iCurrentPlayer < len(self.players)) and (not self.getCurrentPlayer().isPlayerTurn)):
             self.doNextPlayer()
 
+
+        self.updateHighlight()
+
+
+    def updateHighlight(self):
 
         self.fHighlightValue += self.fHighlightIncrement
         if (self.fHighlightValue > 1.0):
@@ -328,6 +353,7 @@ class GameManager():
         elif (self.fHighlightValue < 0.0):
             self.fHighlightValue = 0.0
             self.fHighlightIncrement = abs(self.fHighlightIncrement)
+
 
 
     def doNextPlayer(self):
@@ -416,6 +442,14 @@ class GameManager():
 
         self.nextRound()
     
+
+    def doStopDraw(self):
+        print("Stop - Draw")
+        for player in self.players:
+            player.iRoundScores.append(0)
+
+        self.nextRound()
+
     def continuePrompt(self):
         self.application.screens["game"].showContinueButtons()
         
@@ -484,7 +518,16 @@ class GameManager():
         
 
     def getCurrentPlayer(self):
-        return self.players[self.iCurrentPlayer]
+        currentplayer = None
+        if ( (self.iCurrentPlayer >= 0) and (self.iCurrentPlayer < len(self.players))):
+            currentplayer = self.players[self.iCurrentPlayer]
+
+        return currentplayer
 
     def getIdlePlayer(self):
-        return self.players[(self.iCurrentPlayer + 1) % 2]        
+        idleplayer = None
+        iIdle = (self.iCurrentPlayer + 1) % 2
+        if ((iIdle >= 0) and (iIdle < len(self.players))):
+            idleplayer =  self.players[(self.iCurrentPlayer + 1) % 2]        
+       
+        return idleplayer

@@ -17,6 +17,7 @@ class ScreenGame(Screen):
     def update(self):
         self.application.gamemanager.update()
 
+
     def draw(self, display, font):
         display.blit(self.application.gamemanager.background[0], (0, 0))
         gamemanager = self.application.gamemanager
@@ -34,9 +35,11 @@ class ScreenGame(Screen):
         
         for player in gamemanager.players:
             player.draw(display, font)
-            
-        for button in self.buttons:
-            button.draw(display, font)
+
+
+#        for button in self.buttons:
+#            button.draw(display, font)
+        super().draw(display, font)
 
 
         strRound = "Round " + str(gamemanager.iRound + 1)
@@ -73,14 +76,19 @@ class ScreenGame(Screen):
 
     def mousePressed(self, mousePosition):
         super().mousePressed(mousePosition)
-        currentPlayer = self.application.gamemanager.players[self.application.gamemanager.iCurrentPlayer]
-        currentPlayer.mousePressed(mousePosition[0], mousePosition[1])
+
+        currentPlayer = self.application.gamemanager.getCurrentPlayer()
+        if (not currentPlayer == None):
+            currentPlayer.mousePressed(mousePosition[0], mousePosition[1])
     
     def mouseReleased(self, mousePosition):
         mouseX = mousePosition[0]
         mouseY = mousePosition[1]
-        currentPlayer = self.application.gamemanager.players[self.application.gamemanager.iCurrentPlayer]
-        currentPlayer.mouseReleased(mouseX, mouseY)
+
+#        currentPlayer = self.application.gamemanager.players[self.application.gamemanager.iCurrentPlayer]
+        currentPlayer = self.application.gamemanager.getCurrentPlayer()
+        if (not currentPlayer == None):
+            currentPlayer.mouseReleased(mouseX, mouseY)
 
         
     def mouseMoved(self, mousePosition):
@@ -94,8 +102,9 @@ class ScreenGame(Screen):
 
         super().mouseMoved(mousePosition)
 
-        currentPlayer = gamemanager.players[gamemanager.iCurrentPlayer]
-        currentPlayer.dragCard(mouseX, mouseY)
+        currentPlayer = gamemanager.getCurrentPlayer()
+        if (not currentPlayer == None):
+            currentPlayer.dragCard(mouseX, mouseY)
         
         self.checkCardsHover(mouseX, mouseY)
         
@@ -107,7 +116,7 @@ class ScreenGame(Screen):
             else:
                 pygame.mouse.set_cursor(*pygame.cursors.arrow)
             
-            
+
     def checkCardsHover(self, x, y):
         gamemanager = self.application.gamemanager
 

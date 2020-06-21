@@ -45,8 +45,9 @@ class ScreenGameComplete(Screen):
         self.buttons[0].y = 200 + (self.application.options.iTotalRounds * ScreenGameComplete.ROW_SPACING)
 
 
-        for button in self.buttons:
-            button.draw(display, font)
+#        for button in self.buttons:
+#            button.draw(display, font)
+        super().draw(display, font)
 
 
         strText = "Game Complete"

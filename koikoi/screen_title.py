@@ -59,8 +59,9 @@ class ScreenTitle(Screen):
         iOffset = (Globals.SCREEN_SIZE[0] -  DrawHelper.getTextSize(strCopyright, font['normal'])[0]) / 2
         DrawHelper.drawTextShadow(strCopyright, iOffset, 600, (255, 255, 255), display, font['normal'])
 
-        for button in self.buttons:
-            button.draw(display, font)
+#        for button in self.buttons:
+#            button.draw(display, font)
+        super().draw(display, font)
 
     
     def doStart(self):
