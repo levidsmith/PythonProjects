@@ -218,7 +218,8 @@ class Player:
             self.score.checkScore(self.match_cards)
             self.setCardPositions()
             successfulMatch = True
-            self.gamemanager.sound_effects['card_drop'].play()
+            if (self.gamemanager.application.options.soundEffectsEnabled):
+                self.gamemanager.sound_effects['card_drop'].play()
             
                 
         

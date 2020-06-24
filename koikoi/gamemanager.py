@@ -85,8 +85,9 @@ class GameManager():
     def load_audio(self):
         pygame.mixer.music.load('audio/PyKoiKoi_game.mp3')
         pygame.mixer.music.set_volume(0.5)
-        self.sound_effects['card_drop'] = pygame.mixer.Sound('audio/card_drop.wav')
-        self.sound_effects['next_player'] = pygame.mixer.Sound('audio/next_player.wav')
+        if (self.application.options.soundEffectsEnabled):
+            self.sound_effects['card_drop'] = pygame.mixer.Sound('audio/card_drop.wav')
+            self.sound_effects['next_player'] = pygame.mixer.Sound('audio/next_player.wav')
 
     def set_audio_volume(self, vol):
         pygame.mixer.music.set_volume(0)
@@ -360,7 +361,8 @@ class GameManager():
         
 
         print("doNextPlayer " + str(self.iCurrentPlayer))
-        self.sound_effects['next_player'].play()
+        if (self.application.options.soundEffectsEnabled):
+            self.sound_effects['next_player'].play()
         
             
 
