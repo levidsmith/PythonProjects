@@ -33,6 +33,7 @@ class Application:
     def main(self):
 
         pygame.init()
+        pygame.mixer.init()
         display = pygame.display.set_mode(Globals.SCREEN_SIZE)
         pygame.display.set_caption('Hanafuda Koi Koi')
         font = {}
@@ -99,7 +100,7 @@ class Application:
             pygame.display.update()
             clock.tick(60)
         
-    
+        pygame.mixer.quit()
         pygame.quit()
         quit()
   
