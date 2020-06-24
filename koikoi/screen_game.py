@@ -37,8 +37,6 @@ class ScreenGame(Screen):
             player.draw(display, font)
 
 
-#        for button in self.buttons:
-#            button.draw(display, font)
         super().draw(display, font)
 
 
@@ -85,7 +83,6 @@ class ScreenGame(Screen):
         mouseX = mousePosition[0]
         mouseY = mousePosition[1]
 
-#        currentPlayer = self.application.gamemanager.players[self.application.gamemanager.iCurrentPlayer]
         currentPlayer = self.application.gamemanager.getCurrentPlayer()
         if (not currentPlayer == None):
             currentPlayer.mouseReleased(mouseX, mouseY)

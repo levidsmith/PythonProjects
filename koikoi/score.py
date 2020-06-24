@@ -127,13 +127,11 @@ class Score:
         #Tanzaku matches
         strKey = 'tanzaku'
         if (not strKey in self.scoreDict):
-#            print("tanzaku does not exist - Ribbons: " + str(iRibbons))
             if (iRibbons >= 5):
                 iPoints = 1 + (iRibbons - 5)
                 self.scoreDict[strKey] = iPoints
                 self.hasNewScore = True
         else:
-#            print("tanzaku exists - Ribbons: " + str(iRibbons))
             iPoints = 1 + (iRibbons - 5)
             if (self.scoreDict[strKey] < iPoints):
                 self.scoreDict[strKey] = iPoints

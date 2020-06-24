@@ -52,10 +52,6 @@ class Player:
     
     def draw(self, display, font):
         for card in self.cards:
-#            if (card == self.selectedCard):
-#                card.drawSelected(display, font)
-#            else:
-#                card.draw(display, font)
             card.draw(display, font)
 
 
@@ -123,7 +119,6 @@ class Player:
             self.iStep = Player.STEP_DRAW
 
         if (self.iStep == Player.STEP_DRAW and len(self.gamemanager.cards) == 0):
-            #self.iStep = Player.STEP_DRAW
             self.iStep = Player.STEP_DONE
             self.gamemanager.doStopDraw()
             
@@ -213,12 +208,10 @@ class Player:
             if (len(possible_matches) == 3):  #handle the special case of three matching cards
                 for card in possible_matches:
                     self.match_cards.append(card)
-                    #self.gamemanager.table.cards.remove(card)
                     self.gamemanager.table.removeCard(card)
 
             else:
                 self.match_cards.append(match_card2)
-#                self.gamemanager.table.cards.remove(match_card2)
                 self.gamemanager.table.removeCard(match_card2)
 
 
@@ -255,7 +248,6 @@ class Player:
       
     def doDiscard(self, card):
         card.isHidden = False
-#        self.gamemanager.table.cards.append(card)
         self.gamemanager.table.addCard(card)
         self.gamemanager.setCardPositions()
         if (card in self.cards):
@@ -362,7 +354,6 @@ class Player:
                     print("no card landed")
                     self.selectedCard.targetPosition = self.selectedCard.previousPosition
                     self.selectedCard = None
-#                    self.gamemanager.resetHints()
                     self.gamemanager.checkHints()
 
             elif (self.iStep == Player.STEP_DRAW_MATCH):
@@ -391,7 +382,6 @@ class Player:
                         self.selectedCard = None
                         self.gamemanager.checkHints()
 
-#            self.gamemanager.resetHints()
 
                 
         
@@ -402,13 +392,8 @@ class Player:
             self.selectedCard.targetPosition = (x - self.selectedOffset[0], y - self.selectedOffset[1])
 
     def selectCard(self, card, xPress, yPress):
-#        print("Selected card " + str(card))
         self.selectedOffset = (xPress - card.x, yPress - card.y)
-#        self.gamemanager.resetHints()
         self.selectedCard = card
         self.selectedCard.previousPosition = (self.selectedCard.x, self.selectedCard.y)
         self.gamemanager.checkHints()
-#        cardMatches = self.getPossibleMatches(card)
-#        for card in cardMatches:
-#            card.isHint = True
 

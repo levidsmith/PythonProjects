@@ -57,14 +57,8 @@ class Table:
 
         foundSlot = False
         iSlot = -1
-#        for idx, cardSlot in enumerate(self.card_slots):
-#            if (not (cardSlot in self.cards)):
-#                iSlot = idx
-#                foundSlot = True
-                #self.card_slots[card] = idx
 
         i = 0
-#        for i in range(0, self.iNextCardSlot):
         while (i < self.iNextCardSlot):
             if (not foundSlot):
                 if (not (i in self.card_slots.values())):
@@ -88,15 +82,8 @@ class Table:
         self.card_slots.pop(card, None)
 
     def setCardPositions(self):
-#        i = 0
-#        iCardsPerRow = math.ceil(len(self.cards) / 2)
-#        iCardsPerRow = math.ceil(self.iNextCardSlot / 2)
         
         
         for card in self.cards:
             card.targetPosition = (self.position[0] + (math.floor(self.card_slots[card] / 2) * 80), self.position[1] + 160 * (self.card_slots[card] % 2))
-#            card.targetPosition = (self.position[0] + ((self.card_slots[card] % iCardsPerRow) * 80), self.position[1] + 160 * math.floor(self.card_slots[card] / iCardsPerRow))
-
-#            card.targetPosition = (self.position[0] + ((i % iCardsPerRow) * 80), self.position[1] + 160 * math.floor(i / iCardsPerRow))
-#            i += 1
 

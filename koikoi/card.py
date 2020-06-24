@@ -117,11 +117,6 @@ class Card:
 
 
 
-#    def drawSelected(self, display, font):
-#        c = (0, 128, 0)
-#        pygame.draw.rect(display, c, (self.x, self.y, self.w, self.h))
-
-
     def update(self):
         iSpeed = self.MOVE_SPEED
     

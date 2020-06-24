@@ -13,12 +13,10 @@ class ChooseDealer():
         self.chooseCard = True
         self.chosen_card = None
         self.iDealerPlayer = -1
-#        self.application.screens["choosedealer"].restart()
 
 
     def update(self):
         if (len(self.cards) < 2):
-#            self.createDeck()
             self.application.gamemanager.createDeck()
 
         while (len(self.cards) < 2):

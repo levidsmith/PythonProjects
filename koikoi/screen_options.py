@@ -103,8 +103,6 @@ class ScreenOptions(Screen):
 
         display.blit(self.imgBackground, (0, 0))
 
-#        for button in self.buttons:
-#            button.draw(display, font)
         super().draw(display, font)
 
 
@@ -114,17 +112,6 @@ class ScreenOptions(Screen):
         DrawHelper.drawTextShadow("Rounds", iOffsetX, iOffsetY + (iSpacing * 1), (255, 255, 255), display, font['normal'])
         DrawHelper.drawTextShadow(str(self.application.options.iTotalRounds), iOffsetValueX, iOffsetY + (iSpacing * 1), (255, 255, 0), display, font['normal'])
 
-
-#        yesnoOptions = [True, False]
-#        yesnoMap = {}
-#        yesnoMap[True] = "Yes"
-#        yesnoMap[False] = "No"
-
-
- #       onoffOptions = [True, False]
-#        onoffMap = {}
-#        onoffMap[True] = "On"
-#        onoffMap[False] = "Off"
 
 
         DrawHelper.drawTextShadow("Show Hints", iOffsetX, iOffsetY + (iSpacing * 2), (255, 255, 255), display, font['normal'])
@@ -144,8 +131,6 @@ class ScreenOptions(Screen):
     def doBegin(self):
         if (len(self.application.options.strName) >= 3):
             print("options name: " + self.application.options.strName)
-           # self.application.gamemanager.restart()
-            #self.application.loadScreen("game")
             self.application.choosedealer.restart()
             self.application.loadScreen("choosedealer")            
 

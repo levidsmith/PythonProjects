@@ -23,8 +23,6 @@ class GameManager():
     
     background = []
 
-#    iCurrentPlayer = 0
-    
     deck_position = (64, 296)
     draw_card_position = (256, 296)
 
@@ -94,7 +92,6 @@ class GameManager():
         pygame.mixer.music.set_volume(0)
     
     def restart(self):
-#        self.iCurrentPlayer = 0
         self.players.clear()
         self.table.restart()
         self.draw_card = None
@@ -137,14 +134,11 @@ class GameManager():
         
         self.dealCards()
         
-#        self.players[self.iCurrentPlayer].isPlayerTurn = True
-#        self.players[self.iCurrentPlayer].iWaitDelay = self.WAIT_DELAY
         self.getCurrentPlayer().isPlayerTurn = True
         if (not self.getCurrentPlayer().isHuman):
             self.getCurrentPlayer().iWaitDelay = self.WAIT_DELAY
 
         self.checkHints()
-#        self.players[self.iCurrentPlayer].iWaitDelay = self.WAIT_DELAY
 
 
         if (self.application.options.musicEnabled):
@@ -260,11 +254,9 @@ class GameManager():
             draw_card.x = 0
             draw_card.y = (Globals.SCREEN_SIZE[1] - Card.h) / 2
             draw_card.isHidden = False
-#            self.table.cards.append(draw_card)
             self.table.addCard(draw_card)
 
         self.setCardPositions()
-#        self.table.setCardPositions()
 
         for player in self.players:
 
@@ -336,7 +328,6 @@ class GameManager():
         for player in self.players:
             player.update()
 
-#        print ("iCurrentPlayer: " + str(self.iCurrentPlayer))
         if ( (self.iCurrentPlayer >= 0) and (self.iCurrentPlayer < len(self.players)) and (not self.getCurrentPlayer().isPlayerTurn)):
             self.doNextPlayer()
 
@@ -425,7 +416,6 @@ class GameManager():
         for player in self.players:
             if (player == self.getCurrentPlayer()):
                 iPoints = player.score.iTotalPoints
-#                if (self.players[(self.iCurrentPlayer + 1) % 2].score.isKoi):
                 if (self.getIdlePlayer().score.isKoi):
                     iPoints *= 2
                 if (player.score.iTotalPoints >= 7):
