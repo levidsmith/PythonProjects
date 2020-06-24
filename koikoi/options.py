@@ -14,7 +14,11 @@ class Options:
         self.showCardType = True
         self.musicEnabled = True
         
-        print(os.environ['OS'])
+        strOS = ""
+        if ('OS' in os.environ):
+            strOS = os.environ['OS']
+        print("OS is " + strOS)
+        
         self.soundEffectsEnabled = True
-        if (os.environ['OS'] != "Windows_NT"):
+        if (strOS != "Windows_NT"):
             self.soundEffectsEnabled = False
