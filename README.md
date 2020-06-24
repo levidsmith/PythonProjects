@@ -10,8 +10,8 @@ Download and install Python
 https://www.python.org/downloads/
 
 Check Python version (requires 3.8)
-> python --version
-# python3 --version
+Windows > python --version
+Linux # python3 --version
 If you see a message about "no module named request", then you need to upgrade to python3
 
 
@@ -20,8 +20,8 @@ Installing
 Windows
 
 Run the python package manager and install pygame
-> cd <path to python>\Python\Python38-32\Scripts
-> pip install pygame
+ > cd <path to python>\Python\Python38-32\Scripts
+ > pip install pygame
 
 Ubuntu Linux
 
